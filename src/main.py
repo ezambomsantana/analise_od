@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import sys
 
-folder = "c:/dev/od/"
+folder = "/home/eduardo/dev/analise_od/src/"
 arq87 = "dados87.csv"
 arq97 = "dados97.csv"
 arq07 = "dados07.csv"
