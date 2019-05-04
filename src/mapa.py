@@ -99,7 +99,7 @@ def main():
         ))]
 
     flight_paths = []
-    for index, row in df.head(1000).iterrows():    
+    for index, row in df.tail(1000).iterrows():    
         flight_paths.append(
             go.Scattergeo(
                 lat = [row['COORD_O_X'], row['COORD_D_X']],
@@ -109,13 +109,13 @@ def main():
                     width = 1,
                     color = 'red',
                 ),
-                opacity = 1,
+                opacity = float(row['FE_VIA']) / float(df['FE_VIA'].max()),
             )
         )
 
     layout = go.Layout(
         title = go.layout.Title(
-            text = 'Feb. 2011 American Airline flight paths<br>(Hover for airport names)'
+            text = '1000 maiores fluxos em Sao Paulo -> OD 2007'
         ),
         showlegend = False,
         geo = go.layout.Geo(
