@@ -8,7 +8,7 @@ import utm
 
 import sys  
 
-import plotly.plotly as py
+from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import plotly.graph_objs as go
 import plotly
 
@@ -99,7 +99,7 @@ def main():
         ))]
 
     flight_paths = []
-    for index, row in df.tail(1000).iterrows():    
+    for index, row in df.iterrows():    
         flight_paths.append(
             go.Scattergeo(
                 lat = [row['COORD_O_X'], row['COORD_D_X']],
@@ -128,7 +128,7 @@ def main():
     )
 
     fig = go.Figure(data = flight_paths + airports, layout = layout)
-    py.plot(fig, filename = 'd3-flight-paths')
+    plot(fig, filename = 'd3-flight-paths')
 
 if __name__ == '__main__':
     main()
