@@ -99,7 +99,7 @@ def main():
         ))]
 
     flight_paths = []
-    for index, row in df.iterrows():    
+    for index, row in df.tail(500).iterrows():    
         flight_paths.append(
             go.Scattergeo(
                 lat = [row['COORD_O_X'], row['COORD_D_X']],
@@ -118,6 +118,8 @@ def main():
             text = '1000 maiores fluxos em Sao Paulo -> OD 2007'
         ),
         showlegend = False,
+        width = 2000,
+        height = 900,
         geo = go.layout.Geo(
             scope = 'south america',
             projection = go.layout.geo.Projection(type = 'azimuthal equal area'),
