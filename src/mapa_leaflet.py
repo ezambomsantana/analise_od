@@ -82,19 +82,22 @@ def main():
 
     print(df)
 
+
     G = nx.Graph()
     for i, row in df.iterrows():
         G.add_node(row['ZONA_O'])
 
-    for index, row in df.iterrows():    
+    for index, row in df.tail(10000).iterrows():    
         o = row['ZONA_O']
         d = row['ZONA_D']
-        G.add_edge(o, d)
+        G.add_edge(o, d, weight=row['FE_VIA'])
     
     fig, ax = plt.subplots()
 
+    weights = [(G[u][v]['weight'] / df['FE_VIA'].max()) for u,v in G.edges()]
+
     nx.draw_networkx_nodes(G ,pos=dict_pos,node_size=10,node_color='red',edge_color='k',alpha=.5, with_labels=True)
-    nx.draw_networkx_edges(G ,pos=dict_pos,edge_color='gray', alpha=.1)
+    nx.draw_networkx_edges(G ,pos=dict_pos,edge_color='gray', alpha=.3)
     nx.draw_networkx_labels(G ,dict_pos, label_pos =10.3)
 
     mplleaflet.show(fig=ax.figure)
