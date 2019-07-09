@@ -7,6 +7,7 @@ folder = "/home/eduardo/dev/analise_od/src/"
 arq87 = "dados87.csv"
 arq97 = "dados97.csv"
 arq07 = "dados07.csv"
+arq17 = "dados17.csv"
 
 def main():
 
@@ -15,9 +16,11 @@ def main():
     data87 = pd.read_csv(folder + arq87, dtype=None, header=0,delimiter=";", low_memory=False) 
     data97 = pd.read_csv(folder + arq97, dtype=None, header=0,delimiter=";", low_memory=False) 
     data07 = pd.read_csv(folder + arq07, dtype=None, header=0,delimiter=";", low_memory=False) 
+    data17 = pd.read_csv(folder + arq17, dtype=None, header=0,delimiter=";", low_memory=False) 
 
-    num_trips(data87, data97, data07)
+    num_trips(data87, data97, data07, data17)
 
+    transporte_2017 = [1, 2, 3, 4, 5, 6, 8]
     transporte_2007 = [1, 9 , 12, 13]
     transporte_1997 = [1, 7 , 8, 9]
     transporte_1987 = [1, 2, 3, 9, 9 , 10]
@@ -25,31 +28,39 @@ def main():
     data_morning_sp87 = filter_data(data87, 'MUNIORIG', 'MUNIORIG', 1, transporte_1987)
     data_morning_sp97 = filter_data(data97, 'MUNIORIG', 'MUNIORIG', 36, transporte_1997)
     data_morning_sp07 = filter_data(data07, 'MUNI_O', 'MUNI_D', 36, transporte_2007)
+    data_morning_sp17 = filter_data(data17, 'MUNI_O', 'MUNI_D', 36, transporte_2017)
         
     medias87 = get_medias(data_morning_sp87)
     medias97 = get_medias(data_morning_sp97)
     medias07 = get_medias(data_morning_sp07)
+    medias17 = get_medias(data_morning_sp17)
 
     save_violin_plot(medias87, 'publico87.png')
     save_violin_plot(medias97, 'publico97.png')
     save_violin_plot(medias07, 'publico07.png')
+    save_violin_plot(medias17, 'publico17.png')
 
-    modos87 = {0:'outros',1:'onibus',2:'onibus',3:'onibus',8:'onibus',4:'escolar',5:'carro',7:'taxi',9:'metro', 10:'trem',11:'moto', 12:'bicicleta', 14:'outros', 13:'pe',15:'outros', 6:'carro'}
-    modos97 = {0:'outros',1:'onibus',2:'onibus',3:'escolar',7:'onibus',4:'carro',5:'carro',6:'taxi',8:'metro', 9:'trem',10:'moto', 11:'bicicleta', 14:'outros', 12:'pe',15:'outros', 13:'carro'}
-    modos07 = {0:'outros',1:'onibus',2:'onibus',3:'onibus',4:'onibus',5:'escolar',6:'carro',7:'carro', 8:'taxi',9:'onibus', 10:'onibus',11:'onibus', 12:'metro', 13:'trem', 14:'moto',15:'bicicleta', 16:'pe'}
+ #   mean_travel_time(data_morning_sp87, data_morning_sp97, data_morning_sp07, data_morning_sp17)
+
+    modos87 = {0:'outros',1:'onibus',2:'onibus',3:'fretado',4:'escolar',5:'carro-dirigindo',6:'carro-passageiro', 7:'taxi',8:'onibus',9:'metro', 10:'trem',11:'moto', 12:'bicicleta', 13:'pe', 14:'caminhao',15:'outros'}
+    modos97 = {0:'outros',1:'onibus',2:'fretado',3:'escolar',4:'carro-dirigindo',5:'carro-passageiro',6:'taxi',7:'onibus',8:'metro', 9:'trem',10:'moto', 11:'bicicleta', 12:'pe',13:'outros'}
+    modos07 = {0:'outros',1:'onibus',2:'onibus',3:'onibus',4:'fretado',5:'escolar',6:'carro-dirigindo',7:'carro-passageiro', 8:'taxi',9:'onibus', 10:'onibus',11:'onibus', 12:'metro', 13:'trem', 14:'moto',15:'bicicleta', 16:'pe', 17:'outros'}
+    modos17 = {0:'outros',1:'metro',2:'trem',3:'metro',4:'onibus',5:'onibus',6:'onibus',7:'fretado', 8:'escolar',9:'carro-dirigindo', 10: 'carro-passageiro', 11:'taxi', 12:'taxi-nao-convencional', 13:'moto', 14:'moto-passageiro', 15:'bicicleta', 16:'pe', 17: 'outros'}
     
     get_times_by_modoprin(data87, modos87, 'tempo87.png')
     get_times_by_modoprin(data97, modos97, 'tempo97.png')
     get_times_by_modoprin(data07, modos07, 'tempo07.png')
+    get_times_by_modoprin(data17, modos17, 'tempo17.png')
 
     viagens_tipo(data87, 'viagens_modo87.png')
     viagens_tipo(data97, 'viagens_modo97.png')
     viagens_tipo(data07, 'viagens_modo07.png')
+    viagens_tipo(data17, 'viagens_modo17.png')
 
-    tipo_viagem(data87,data97,data07)
+    tipo_viagem(data87,data97,data07, data17)
 
         
-def tipo_viagem(data87, data97, data07):
+def tipo_viagem(data87, data97, data07, data17):
   conj87 = data87[['MODOPRIN', 'FE_VIA']].groupby(['MODOPRIN']).sum().sort_values(by=['FE_VIA']).reset_index()
   conj87.columns = ['MODOPRIN', 'FE_VIA']
   conj87 = conj87.set_index('MODOPRIN')
@@ -62,8 +73,12 @@ def tipo_viagem(data87, data97, data07):
   conj07.columns = ['MODOPRIN', 'FE_VIA']
   conj07 = conj07.set_index('MODOPRIN')
 
-  novo = pd.concat([conj87['FE_VIA'], conj97['FE_VIA'], conj07['FE_VIA']], axis=1, keys=['1987', '1997','2007'])
-  novo.plot( y=["1987", "1997", "2007"], kind="bar")
+  conj17 = data17[['MODOPRIN', 'FE_VIA']].groupby(['MODOPRIN']).sum().sort_values(by=['FE_VIA']).reset_index()
+  conj17.columns = ['MODOPRIN', 'FE_VIA']
+  conj17 = conj17.set_index('MODOPRIN')
+
+  novo = pd.concat([conj87['FE_VIA'], conj97['FE_VIA'], conj07['FE_VIA'], conj17['FE_VIA']], axis=1, keys=['1987', '1997','2007', '2017'])
+  novo.plot( y=["1987", "1997", "2007", "2017"], kind="bar")
   plt.savefig(folder + 'numero_transporte.png', bbox_inches='tight', pad_inches=0.0)
   plt.close()
     
@@ -78,8 +93,11 @@ def viagens_tipo(data, name):
 def get_times_by_modoprin(data, modos, name):
     data['MODOPRIN'] = data['MODOPRIN'].replace(modos)
 
-    individual = data[data['MODOPRIN'].isin(['carro','moto','bicicleta','taxi','pe'])] 
+    individual = data[data['MODOPRIN'].isin(['carro-dirigindo','moto','bicicleta','taxi','pe'])] 
     publico = data[data['MODOPRIN'].isin(['onibus','trem','metro','escolar'])] 
+
+    individual = individual.sort_values(by=['MODOPRIN'])
+    publico = publico.sort_values(by=['MODOPRIN'])
 
     sns.violinplot(x="MODOPRIN", y="DURACAO", data=individual, palette="muted")
     plt.savefig(folder + 'individual_' + name, bbox_inches='tight', pad_inches=0.0)
@@ -89,8 +107,8 @@ def get_times_by_modoprin(data, modos, name):
     plt.savefig(folder + 'publico_' + name, bbox_inches='tight', pad_inches=0.0)
     plt.close()
     
-def num_trips(data87, data97, data07):
-    trips = {'year': ['1987','1997','2007'], 'trips': [data87['FE_VIA'].sum(),data97['FE_VIA'].sum(),data07['FE_VIA'].sum()]}
+def num_trips(data87, data97, data07, data17):
+    trips = {'year': ['1987','1997','2007', '2017'], 'trips': [data87['FE_VIA'].sum(),data97['FE_VIA'].sum(),data07['FE_VIA'].sum(), data17['FE_VIA'].sum()]}
     teste = pd.DataFrame.from_dict(trips, orient='index').transpose()
     teste.plot.bar(x='year', y='trips')
     plt.xlabel('Ano da Pesquisa')
