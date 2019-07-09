@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import sys
+import numpy as np
+import math
 
 folder = "/home/eduardo/dev/analise_od/src/"
 arq87 = "dados87.csv"
@@ -40,13 +42,15 @@ def main():
     save_violin_plot(medias07, 'publico07.png')
     save_violin_plot(medias17, 'publico17.png')
 
- #   mean_travel_time(data_morning_sp87, data_morning_sp97, data_morning_sp07, data_morning_sp17)
-
     modos87 = {0:'outros',1:'onibus',2:'onibus',3:'fretado',4:'escolar',5:'carro-dirigindo',6:'carro-passageiro', 7:'taxi',8:'onibus',9:'metro', 10:'trem',11:'moto', 12:'bicicleta', 13:'pe', 14:'caminhao',15:'outros'}
     modos97 = {0:'outros',1:'onibus',2:'fretado',3:'escolar',4:'carro-dirigindo',5:'carro-passageiro',6:'taxi',7:'onibus',8:'metro', 9:'trem',10:'moto', 11:'bicicleta', 12:'pe',13:'outros'}
     modos07 = {0:'outros',1:'onibus',2:'onibus',3:'onibus',4:'fretado',5:'escolar',6:'carro-dirigindo',7:'carro-passageiro', 8:'taxi',9:'onibus', 10:'onibus',11:'onibus', 12:'metro', 13:'trem', 14:'moto',15:'bicicleta', 16:'pe', 17:'outros'}
     modos17 = {0:'outros',1:'metro',2:'trem',3:'metro',4:'onibus',5:'onibus',6:'onibus',7:'fretado', 8:'escolar',9:'carro-dirigindo', 10: 'carro-passageiro', 11:'taxi', 12:'taxi-nao-convencional', 13:'moto', 14:'moto-passageiro', 15:'bicicleta', 16:'pe', 17: 'outros'}
     
+
+    mean_travel_time(data87, data97, data07, data17, modos87, modos97, modos07, modos17, ['onibus','trem','metro','escolar'])
+    mean_travel_time(data87, data97, data07, data17, modos87, modos97, modos07, modos17, ['carro-dirigindo','moto','bicicleta','taxi','pe'])
+
     get_times_by_modoprin(data87, modos87, 'tempo87.png')
     get_times_by_modoprin(data97, modos97, 'tempo97.png')
     get_times_by_modoprin(data07, modos07, 'tempo07.png')
@@ -57,8 +61,75 @@ def main():
     viagens_tipo(data07, 'viagens_modo07.png')
     viagens_tipo(data17, 'viagens_modo17.png')
 
-    tipo_viagem(data87,data97,data07, data17)
+    tipo_viagem(data87,data97,data07,data17)
 
+
+def calculate_weighted_mean(data):
+    data['FE_VIA'] = data['FE_VIA'].apply(lambda x: 1 if math.isnan(x) else x)
+    data['FE_VIA'] = data['FE_VIA'].apply(lambda x: 1 if int(x) == 0 else x)
+    data['MP'] = data['FE_VIA'] * data['DURACAO']
+    return data
+
+def mean_travel_time(data87, data97, data07, data17, modos87, modos97, modos07, modos17, tipos):
+
+  data87 = calculate_weighted_mean(data87)
+  data97 = calculate_weighted_mean(data97)
+  data07 = calculate_weighted_mean(data07)
+  data17 = calculate_weighted_mean(data17)
+
+  data87['MODOPRIN'] = data87['MODOPRIN'].replace(modos87)
+  data97['MODOPRIN'] = data97['MODOPRIN'].replace(modos97)
+  data07['MODOPRIN'] = data07['MODOPRIN'].replace(modos07)
+  data17['MODOPRIN'] = data17['MODOPRIN'].replace(modos17)
+
+  fig, ax = plt.subplots()
+  data87_2 = data87[data87['MODOPRIN'].isin(tipos)] 
+  data97_2 = data97[data97['MODOPRIN'].isin(tipos)] 
+  data07_2 = data07[data07['MODOPRIN'].isin(tipos)] 
+  data17_2 = data17[data17['MODOPRIN'].isin(tipos)] 
+
+  dataFinal = [
+    ['87', data87_2['MP'].sum() / data87_2['FE_VIA'].sum()], 
+    ['97', data97_2['MP'].sum() / data97_2['FE_VIA'].sum()], 
+    ['07', data07_2['MP'].sum() / data07_2['FE_VIA'].sum()], 
+    ['17', data17_2['MP'].sum() / data17_2['FE_VIA'].sum()]
+  ]
+
+  df = pd.DataFrame(dataFinal, columns = ['ano', 'mean_travel']) 
+  ax = df.plot(ax = ax,
+    x='ano',
+    y='mean_travel',
+    marker='o', 
+    title='Travel time (s) vs. DR ratio (%)',
+    grid=True,
+  )
+
+
+  for x in tipos:
+
+    data87_2 = data87[data87['MODOPRIN'].isin([x])] 
+    data97_2 = data97[data97['MODOPRIN'].isin([x])] 
+    data07_2 = data07[data07['MODOPRIN'].isin([x])] 
+    data17_2 = data17[data17['MODOPRIN'].isin([x])] 
+
+    dataFinal = [
+      ['87', data87_2['MP'].sum() / data87_2['FE_VIA'].sum()], 
+      ['97', data97_2['MP'].sum() / data97_2['FE_VIA'].sum()], 
+      ['07', data07_2['MP'].sum() / data07_2['FE_VIA'].sum()], 
+      ['17', data17_2['MP'].sum() / data17_2['FE_VIA'].sum()]
+    ]
+
+    df = pd.DataFrame(dataFinal, columns = ['ano', 'mean_travel']) 
+
+    ax = df.plot(ax = ax,
+        x='ano',
+        y='mean_travel',
+        marker='o', 
+        grid=True,
+    )
+  ax.set_title('Tempo de viagem por tipo de transporte')
+  ax.legend(['geral'] + tipos)
+  plt.show()  
         
 def tipo_viagem(data87, data97, data07, data17):
   conj87 = data87[['MODOPRIN', 'FE_VIA']].groupby(['MODOPRIN']).sum().sort_values(by=['FE_VIA']).reset_index()
