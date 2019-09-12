@@ -4,8 +4,10 @@ import seaborn as sns
 import sys
 import numpy as np
 import math
+import csv
 
-folder = "/home/eduardo/dev/analise_od/src/"
+folder_data = "/home/eduardo/dev/analise_od/data/"
+folder_images = "/home/eduardo/dev/analise_od/images/"
 arq87 = "dados87.csv"
 arq97 = "dados97.csv"
 arq07 = "dados07.csv"
@@ -13,13 +15,23 @@ arq17 = "dados17.csv"
 
 def main():
 
-    global folder
+    global folder_data
+    global folder_images
 
-    data87 = pd.read_csv(folder + arq87, dtype=None, header=0,delimiter=";", low_memory=False) 
-    data97 = pd.read_csv(folder + arq97, dtype=None, header=0,delimiter=";", low_memory=False) 
-    data07 = pd.read_csv(folder + arq07, dtype=None, header=0,delimiter=";", low_memory=False) 
-    data17 = pd.read_csv(folder + arq17, dtype=None, header=0,delimiter=";", low_memory=False) 
+    data87 = pd.read_csv(folder_data + arq87, dtype=None, header=0,delimiter=";", low_memory=False) 
+    data97 = pd.read_csv(folder_data + arq97, dtype=None, header=0,delimiter=";", low_memory=False) 
+    data07 = pd.read_csv(folder_data + arq07, dtype=None, header=0,delimiter=";", low_memory=False) 
+    data17 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=";", low_memory=False) 
 
+    csv_file = folder_data + "regioes17.csv"
+    mydict = []
+    with open(csv_file, mode='r') as infile:
+        reader = csv.reader(infile, delimiter=";")
+        mydict = {rows[0]:rows[1] for rows in reader}
+
+    data17['NOME_O'] = data17['ZONA_O'].apply(lambda x: '' if pd.isnull(x) else mydict[x])
+    data17['NOME_D'] = data17['ZONA_D'].apply(lambda x: '' if pd.isnull(x) else mydict[x])
+    
     num_trips(data87, data97, data07, data17)
 
     transporte_2017 = [1, 2, 3, 4, 5, 6, 8]
@@ -47,9 +59,10 @@ def main():
     modos07 = {0:'outros',1:'onibus',2:'onibus',3:'onibus',4:'fretado',5:'escolar',6:'carro-dirigindo',7:'carro-passageiro', 8:'taxi',9:'onibus', 10:'onibus',11:'onibus', 12:'metro', 13:'trem', 14:'moto',15:'bicicleta', 16:'pe', 17:'outros'}
     modos17 = {0:'outros',1:'metro',2:'trem',3:'metro',4:'onibus',5:'onibus',6:'onibus',7:'fretado', 8:'escolar',9:'carro-dirigindo', 10: 'carro-passageiro', 11:'taxi', 12:'taxi-nao-convencional', 13:'moto', 14:'moto-passageiro', 15:'bicicleta', 16:'pe', 17: 'outros'}
     
+    mean_travel_time(data87, data97, data07, data17, modos87, modos97, modos07, modos17, ['onibus','trem','metro','escolar'],'publico')
+    mean_travel_time(data87, data97, data07, data17, modos87, modos97, modos07, modos17, ['carro-dirigindo','moto','bicicleta','taxi','pe'],'privado')
 
-    mean_travel_time(data87, data97, data07, data17, modos87, modos97, modos07, modos17, ['onibus','trem','metro','escolar'])
-    mean_travel_time(data87, data97, data07, data17, modos87, modos97, modos07, modos17, ['carro-dirigindo','moto','bicicleta','taxi','pe'])
+    order_neighborhood(data17, modos17, ['onibus','trem','metro'], ['carro-dirigindo','moto','bicicleta','taxi'])
 
     get_times_by_modoprin(data87, modos87, 'tempo87.png')
     get_times_by_modoprin(data97, modos97, 'tempo97.png')
@@ -70,7 +83,53 @@ def calculate_weighted_mean(data):
     data['MP'] = data['FE_VIA'] * data['DURACAO']
     return data
 
-def mean_travel_time(data87, data97, data07, data17, modos87, modos97, modos07, modos17, tipos):
+def order_neighborhood(data17, modos17, publico, privado):
+
+  data17 = data17[data17['MUNI_O'] == 36] 
+  data17 = data17[data17['MUNI_D'] == 36] 
+    
+  data17 = data17[data17['H_SAIDA'] >= 6 ]
+  data17 = data17[data17['H_SAIDA'] <= 9]
+
+  data17 = data17[data17['MOTIVO_O'].isin([8])]
+  data17 = data17[data17['MOTIVO_D'].isin([1,2,3])]
+  
+  data17 = calculate_weighted_mean(data17)
+
+  data17['MODOPRIN'] = data17['MODOPRIN'].replace(modos17)
+
+  data17_publico = data17[data17['MODOPRIN'].isin(publico)] 
+  data17_privado = data17[data17['MODOPRIN'].isin(privado)] 
+
+  tudo = data17[data17['MODOPRIN'].isin(publico + privado)] 
+
+  calculate_corr(tudo, 'publico')
+#  calculate_corr(data17_privado, 'privado')
+ # calculate_corr(tudo, 'tudo')
+
+def calculate_corr(data, type):
+
+  data_mp = data[['NOME_O', 'MP']].groupby(['NOME_O']).sum().sort_values(by=['MP']).reset_index()
+  data_mp = data_mp.set_index('NOME_O')
+
+  data_fe = data[['NOME_O', 'FE_VIA']].groupby(['NOME_O']).sum().sort_values(by=['FE_VIA']).reset_index()
+  data_fe = data_fe.set_index('NOME_O')
+
+  data_renda = data[['NOME_O', 'RENDA_FA']].groupby(['NOME_O']).mean().sort_values(by=['RENDA_FA']).reset_index()
+  data_renda = data_renda.set_index('NOME_O')
+
+  data_inst = data[['NOME_O', 'DURACAO']].groupby(['NOME_O']).mean().sort_values(by=['DURACAO']).reset_index()
+  data_inst = data_inst.set_index('NOME_O')
+
+  df_row = data_mp.join(data_fe).join(data_renda).join(data_inst)
+  df_row['MEDIA'] = df_row['MP'] / df_row['FE_VIA']
+
+  print(df_row.sort_values(by=['RENDA_FA']))
+
+  print(df_row.corr(method ='pearson'))
+
+
+def mean_travel_time(data87, data97, data07, data17, modos87, modos97, modos07, modos17, tipos, tipo):
 
   data87 = calculate_weighted_mean(data87)
   data97 = calculate_weighted_mean(data97)
@@ -104,7 +163,6 @@ def mean_travel_time(data87, data97, data07, data17, modos87, modos97, modos07, 
     grid=True,
   )
 
-
   for x in tipos:
 
     data87_2 = data87[data87['MODOPRIN'].isin([x])] 
@@ -129,7 +187,8 @@ def mean_travel_time(data87, data97, data07, data17, modos87, modos97, modos07, 
     )
   ax.set_title('Tempo de viagem por tipo de transporte')
   ax.legend(['geral'] + tipos)
-  plt.show()  
+  plt.savefig(folder_images + tipo + '_tempo_tipo_transporte.png', bbox_inches='tight', pad_inches=0.0)
+  plt.close()
         
 def tipo_viagem(data87, data97, data07, data17):
   conj87 = data87[['MODOPRIN', 'FE_VIA']].groupby(['MODOPRIN']).sum().sort_values(by=['FE_VIA']).reset_index()
@@ -150,7 +209,7 @@ def tipo_viagem(data87, data97, data07, data17):
 
   novo = pd.concat([conj87['FE_VIA'], conj97['FE_VIA'], conj07['FE_VIA'], conj17['FE_VIA']], axis=1, keys=['1987', '1997','2007', '2017'])
   novo.plot( y=["1987", "1997", "2007", "2017"], kind="bar")
-  plt.savefig(folder + 'numero_transporte.png', bbox_inches='tight', pad_inches=0.0)
+  plt.savefig(folder_images + 'numero_transporte.png', bbox_inches='tight', pad_inches=0.0)
   plt.close()
     
 
@@ -158,7 +217,7 @@ def viagens_tipo(data, name):
     conj = data[['MODOPRIN', 'FE_VIA']].groupby(['MODOPRIN']).sum().sort_values(by=['FE_VIA']).reset_index()
     conj.columns = ['MODOPRIN', 'FE_VIA']
     conj.plot.bar(x='MODOPRIN', y='FE_VIA')
-    plt.savefig(folder + name, bbox_inches='tight', pad_inches=0.0)
+    plt.savefig(folder_images + name, bbox_inches='tight', pad_inches=0.0)
     plt.close()
 
 def get_times_by_modoprin(data, modos, name):
@@ -171,11 +230,11 @@ def get_times_by_modoprin(data, modos, name):
     publico = publico.sort_values(by=['MODOPRIN'])
 
     sns.violinplot(x="MODOPRIN", y="DURACAO", data=individual, palette="muted")
-    plt.savefig(folder + 'individual_' + name, bbox_inches='tight', pad_inches=0.0)
+    plt.savefig(folder_images + 'individual_' + name, bbox_inches='tight', pad_inches=0.0)
     plt.close()
     
     sns.violinplot(x="MODOPRIN", y="DURACAO", data=publico, palette="muted")
-    plt.savefig(folder + 'publico_' + name, bbox_inches='tight', pad_inches=0.0)
+    plt.savefig(folder_images + 'publico_' + name, bbox_inches='tight', pad_inches=0.0)
     plt.close()
     
 def num_trips(data87, data97, data07, data17):
@@ -184,7 +243,7 @@ def num_trips(data87, data97, data07, data17):
     teste.plot.bar(x='year', y='trips')
     plt.xlabel('Ano da Pesquisa')
     plt.ylabel('Numero de Viagens')
-    plt.savefig(folder + 'total_viagens_od.png', bbox_inches='tight', pad_inches=0.0)
+    plt.savefig(folder_images + 'total_viagens_od.png', bbox_inches='tight', pad_inches=0.0)
     plt.close()
 
 def filter_data(data, cod_origin, cod_destination, id_city, array_transportation):
@@ -214,7 +273,7 @@ def save_violin_plot(data, nome):
     sns.violinplot(data=data, alpha=0.5)
     plt.xlabel('Tipo de Distrito: Distritos com menores medias, maiores medias e a media geral da cidade')
     plt.ylabel('Tempo de viagem')
-    plt.savefig(folder + nome, bbox_inches='tight', pad_inches=0.0)
+    plt.savefig(folder_images + nome, bbox_inches='tight', pad_inches=0.0)
     plt.close()
 
 
