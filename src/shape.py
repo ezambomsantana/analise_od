@@ -16,6 +16,7 @@ folder_data = "/home/eduardo/dev/analise_od/data/"
 arq17 = "dados17.csv"
 
 can = gpd.GeoDataFrame.from_file("/home/eduardo/Distritos_2017_region.shp", encoding='latin-1')
+metro = gpd.GeoDataFrame.from_file("/home/eduardo/SIRGAS_SHP_linhametro_line.shp", encoding='latin-1')
 
 data17 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=";", low_memory=False) 
 
@@ -27,6 +28,9 @@ with open(csv_file, mode='r') as infile:
 
 data17['NOME_O'] = data17['ZONA_O'].apply(lambda x: '' if pd.isnull(x) else mydict[x])
 data17['NOME_D'] = data17['ZONA_D'].apply(lambda x: '' if pd.isnull(x) else mydict[x])
+data17['NUM_TRANS'] = data17[['MODO1', 'MODO2','MODO3','MODO4']].count(axis=1)
+
+print(data17['NUM_TRANS'])
 
 data17 = calculate_weighted_mean(data17)
 
@@ -51,18 +55,27 @@ can['NomeDistri'] = can['NomeDistri'].apply(lambda x: unidecode.unidecode(x))
 data_renda = data17[['NOME_O', 'RENDA_FA']].groupby(['NOME_O']).mean().sort_values(by=['RENDA_FA']).reset_index()
 data_renda = data_renda.set_index('NOME_O')
 
-df = can.set_index('NomeDistri').join(data_mp).join(data_mp2).join(data_renda)
+data_trans = data17[['NOME_O', 'NUM_TRANS']].groupby(['NOME_O']).mean().sort_values(by=['NUM_TRANS']).reset_index()
+data_trans = data_trans.set_index('NOME_O')
+
+df = can.set_index('NomeDistri').join(data_mp).join(data_mp2).join(data_renda).join(data_trans)
 df['MEDIA'] = df['MP'] / df['FE_VIA']
 
 df = df[df['MUNI_O'] == 36]
 ### many data 
 
+fig, ax = plt.subplots(1, 1)
+
+df.plot(column='NUM_TRANS', ax=ax, legend=True)
+metro.plot(ax=ax, color='red')
+plt.show()
+
 plt.scatter(df.MEDIA, df.RENDA_FA)
 plt.show()
 
 
-data17_coletivo = data17[data17['MODOPRIN'].isin(coletivo)] 
-data17_privado = data17[data17['MODOPRIN'].isin(privado)] 
+data17_coletivo = data17[data17['MODOPRIN'].isin(['onibus'])] 
+data17_privado = data17[data17['MODOPRIN'].isin(privado + coletivo)] 
 
 data17_coletivo = data17_coletivo[['NOME_O', 'FE_VIA']].groupby(['NOME_O']).mean().sort_values(by=['FE_VIA']).reset_index()
 data17_coletivo = data17_coletivo.set_index('NOME_O')
