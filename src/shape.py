@@ -68,6 +68,14 @@ df = df[df['MUNI_O'] == 36]
 
 fig, ax = plt.subplots(1, 1)
 
+df.plot(column='MEDIA', ax=ax, legend=True, cmap='OrRd')
+metro.plot(ax=ax, color='blue')
+plt.savefig(folder_images_maps + 'tempo.png', bbox_inches='tight', pad_inches=0.0)
+
+plt.clf()
+
+fig, ax = plt.subplots(1, 1)
+
 df.plot(column='NUM_TRANS', ax=ax, legend=True, cmap='OrRd')
 metro.plot(ax=ax, color='blue')
 plt.savefig(folder_images_maps + 'num_integracoes.png', bbox_inches='tight', pad_inches=0.0)
