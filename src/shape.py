@@ -5,6 +5,7 @@ import pandas as pd
 import csv
 import unidecode
 import math
+import seaborn as sns
 
 def calculate_weighted_mean(data):
     data['FE_VIA'] = data['FE_VIA'].apply(lambda x: 1 if math.isnan(x) else x)
@@ -38,6 +39,9 @@ modos17 = {0:'outros',1:'metro',2:'trem',3:'metro',4:'onibus',5:'onibus',6:'onib
 coletivo = ['onibus','trem','metro']
 privado = ['carro-dirigindo','moto','bicicleta','taxi']
 
+motorizado = ['onibus','trem','metro', 'carro-dirigindo','moto','taxi']
+nao_motorizado = ['bicicleta', 'pe']
+
 data17['MODOPRIN'] = data17['MODOPRIN'].replace(modos17)
 data17 = data17[data17['MODOPRIN'].isin(coletivo + privado)] 
 
@@ -64,19 +68,21 @@ df = df[df['MUNI_O'] == 36]
 
 fig, ax = plt.subplots(1, 1)
 
-df.plot(column='NUM_TRANS', ax=ax, legend=True)
-metro.plot(ax=ax, color='red')
+df.plot(column='NUM_TRANS', ax=ax, legend=True, cmap='OrRd')
+metro.plot(ax=ax, color='blue')
 plt.savefig(folder_images_maps + 'num_integracoes.png', bbox_inches='tight', pad_inches=0.0)
 
 plt.clf()
 
-plt.scatter(df.MEDIA, df.RENDA_FA)
+lm = sns.lmplot(x='MEDIA',y='RENDA_FA',data=df,fit_reg=True) 
+axes = lm.axes
+axes[0,0].set_ylim(0,)
 plt.savefig(folder_images_maps + 'scatter_renda_tempo.png', bbox_inches='tight', pad_inches=0.0)
 
 plt.clf()
 
-data17_coletivo = data17[data17['MODOPRIN'].isin(['onibus'])] 
-data17_privado = data17[data17['MODOPRIN'].isin(privado + coletivo)] 
+data17_coletivo = data17[data17['MODOPRIN'].isin(coletivo)] 
+data17_privado = data17[data17['MODOPRIN'].isin(privado)] 
 
 data17_coletivo = data17_coletivo[['NOME_O', 'FE_VIA']].groupby(['NOME_O']).mean().sort_values(by=['FE_VIA']).reset_index()
 data17_coletivo = data17_coletivo.set_index('NOME_O')
@@ -90,7 +96,40 @@ df['por_privado'] = df['FE_VIA_privado'] / (df['FE_VIA_coletivo'] + df['FE_VIA_p
 df = df[df['MUNI_O'] == 36]
 
 fig, ax = plt.subplots(1, 1)
-metro.plot(ax=ax, color='red')
-
-df.plot(column='por_coletivo', ax=ax, legend=True)
+metro.plot(ax=ax, color='blue')
+df.plot(column='por_coletivo', ax=ax, legend=True, cmap='OrRd')
 plt.savefig(folder_images_maps + 'porcentagem_coletivo.png', bbox_inches='tight', pad_inches=0.0)
+
+
+fig, ax = plt.subplots(1, 1)
+metro.plot(ax=ax, color='blue')
+df.plot(column='por_privado', ax=ax, legend=True, cmap='OrRd')
+plt.savefig(folder_images_maps + 'porcentagem_privado.png', bbox_inches='tight', pad_inches=0.0)
+
+
+
+
+
+data17_motorizado = data17[data17['MODOPRIN'].isin(motorizado)] 
+data_nao_motorizado = data17[data17['MODOPRIN'].isin(nao_motorizado)] 
+
+data17_motorizado = data17_motorizado[['NOME_O', 'FE_VIA']].groupby(['NOME_O']).mean().sort_values(by=['FE_VIA']).reset_index()
+data17_motorizado = data17_motorizado.set_index('NOME_O')
+
+data_nao_motorizado = data_nao_motorizado[['NOME_O', 'FE_VIA']].groupby(['NOME_O']).mean().sort_values(by=['FE_VIA']).reset_index()
+data_nao_motorizado = data_nao_motorizado.set_index('NOME_O')
+
+df = mapa.set_index('NomeDistri').join(data17_motorizado).join(data_nao_motorizado,lsuffix='_motorizado', rsuffix='_nao_motorizado').join(data_mp)
+df['por_motorizado'] = df['FE_VIA_motorizado'] / (df['FE_VIA_motorizado'] + df['FE_VIA_nao_motorizado'])
+df['por_nao_motorizado'] = df['FE_VIA_nao_motorizado'] / (df['FE_VIA_motorizado'] + df['FE_VIA_nao_motorizado'])
+df = df[df['MUNI_O'] == 36]
+
+fig, ax = plt.subplots(1, 1)
+metro.plot(ax=ax, color='blue')
+df.plot(column='por_motorizado', ax=ax, legend=True, cmap='OrRd')
+plt.savefig(folder_images_maps + 'porcentagem_motorizado.png', bbox_inches='tight', pad_inches=0.0)
+
+fig, ax = plt.subplots(1, 1)
+metro.plot(ax=ax, color='blue')
+df.plot(column='por_nao_motorizado', ax=ax, legend=True, cmap='OrRd')
+plt.savefig(folder_images_maps + 'porcentagem_nao_motorizado.png', bbox_inches='tight', pad_inches=0.0)
