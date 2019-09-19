@@ -6,6 +6,11 @@ import csv
 import unidecode
 import math
 import seaborn as sns
+import geopy.distance
+
+coords_1 = (52.2296756, 21.0122287)
+coords_2 = (52.406374, 16.9251681)
+
 
 def calculate_weighted_mean(data):
     data['FE_VIA'] = data['FE_VIA'].apply(lambda x: 1 if math.isnan(x) else x)
@@ -20,7 +25,9 @@ arq17 = "dados17.csv"
 mapa = gpd.GeoDataFrame.from_file("/home/eduardo/Distritos_2017_region.shp", encoding='latin-1')
 metro = gpd.GeoDataFrame.from_file("/home/eduardo/SIRGAS_SHP_linhametro_line.shp", encoding='latin-1')
 
-data17 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=";", low_memory=False) 
+data17 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str, 'CO_O_X': float, 'CO_O_Y': float, 'CO_D_X': float, 'CO_D_Y': float}, header=0,delimiter=";", low_memory=False) 
+data17 = data17.dropna(subset=['CO_O_X'])
+print(data17['CO_O_X'])
 
 csv_file = folder_data + "regioes17.csv"
 mydict = []
@@ -82,9 +89,7 @@ plt.savefig(folder_images_maps + 'num_integracoes.png', bbox_inches='tight', pad
 
 plt.clf()
 
-lm = sns.lmplot(x='MEDIA',y='RENDA_FA',data=df,fit_reg=True) 
-axes = lm.axes
-axes[0,0].set_ylim(0,)
+ax = sns.regplot(x="MEDIA", y="RENDA_FA", data=df, lowess=True)
 plt.savefig(folder_images_maps + 'scatter_renda_tempo.png', bbox_inches='tight', pad_inches=0.0)
 
 plt.clf()
