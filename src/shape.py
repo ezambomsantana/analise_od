@@ -9,6 +9,15 @@ import seaborn as sns
 import geopy.distance
 import utm
 
+from bokeh.io import output_notebook, show, output_file
+from bokeh.plotting import figure
+from bokeh.models import HoverTool
+from bokeh.palettes import brewer
+
+my_hover = HoverTool()
+
+my_hover.tooltips = [('Address of the point', '@ZONA_O')]
+
 coords_1 = (52.2296756, 21.0122287)
 coords_2 = (52.406374, 16.9251681)
 
@@ -97,6 +106,16 @@ fig, ax = plt.subplots(1, 1)
 df.plot(column='MEDIA', ax=ax, legend=True, cmap='OrRd')
 metro.plot(ax=ax, color='blue')
 plt.savefig(folder_images_maps + 'tempo.png', bbox_inches='tight', pad_inches=0.0)
+
+#Define a sequential multi-hue color palette.
+palette = brewer['YlGnBu'][8]
+#Reverse color order so that dark blue is highest obesity.
+palette = palette[::-1]
+color_mapper = LinearColorMapper(palette = palette, low = 0, high = 40, nan_color = '#d9d9d9')
+p = figure(title = 'Share of adults who are obese, 2016', plot_height = 600 , plot_width = 950, toolbar_location = None)
+p.patches('xs','ys', source = df,fill_color = {'field' :'MEDIA', 'transform' : color_mapper},
+          line_color = 'black', line_width = 0.25, fill_alpha = 1)
+show(p)
 
 plt.clf()
 
