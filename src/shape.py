@@ -8,19 +8,7 @@ import math
 import seaborn as sns
 import geopy.distance
 import utm
-
-from bokeh.io import output_notebook, show, output_file
-from bokeh.plotting import figure
-from bokeh.models import HoverTool
-from bokeh.palettes import brewer
-
-my_hover = HoverTool()
-
-my_hover.tooltips = [('Address of the point', '@ZONA_O')]
-
-coords_1 = (52.2296756, 21.0122287)
-coords_2 = (52.406374, 16.9251681)
-
+from shapely.geometry import shape, LineString, Polygon
 
 def calculate_weighted_mean(data):
     data['FE_VIA'] = data['FE_VIA'].apply(lambda x: 1 if math.isnan(x) else x)
@@ -29,12 +17,25 @@ def calculate_weighted_mean(data):
     data['MP_DIST'] = data['FE_VIA'] * data['DISTANCE']
     return data
 
-folder_data = "/home/eduardo/dev/analise_od/data/"
-folder_images_maps = "/home/eduardo/dev/analise_od/images/maps/"
+folder_data = "/Users/eduardosantana/pesquisa/analise_od/data/"
+folder_images_maps = "/Users/eduardosantana/pesquisa/analise_od/images/maps/"
 arq17 = "dados17.csv"
 
-mapa = gpd.GeoDataFrame.from_file("/home/eduardo/Distritos_2017_region.shp", encoding='latin-1')
-metro = gpd.GeoDataFrame.from_file("/home/eduardo/SIRGAS_SHP_linhametro_line.shp", encoding='latin-1')
+mapa = gpd.GeoDataFrame.from_file("/Users/eduardosantana/anexos/Distritos_2017_region.shp", encoding='latin-1')
+
+metro = gpd.GeoDataFrame.from_file("/Users/eduardosantana/anexos/SIRGAS_SHP_linhametro_line.shp", encoding='latin-1')
+geos = []
+for index, row in mapa.iterrows():
+    pairs = row['geometry']
+    lista = []
+    if (isinstance(pairs, Polygon)):
+        for pair in pairs.exterior.coords:
+            print(pair)
+            dest = utm.to_latlon(pair[0],pair[1], 23, 'K')
+            lista.append(dest)
+    geos.append(Polygon(lista))
+mapa['geometry'] = geos
+print(mapa)
 
 data17 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=";", low_memory=False) 
 data17 = data17.dropna(subset=['CO_O_X'])
@@ -101,21 +102,12 @@ df['MEDIA_DIST'] = df['MP_DIST'] / df['FE_VIA']
 
 df = df[df['MUNI_O'] == 36]
 
+
 fig, ax = plt.subplots(1, 1)
 
 df.plot(column='MEDIA', ax=ax, legend=True, cmap='OrRd')
 metro.plot(ax=ax, color='blue')
 plt.savefig(folder_images_maps + 'tempo.png', bbox_inches='tight', pad_inches=0.0)
-
-#Define a sequential multi-hue color palette.
-palette = brewer['YlGnBu'][8]
-#Reverse color order so that dark blue is highest obesity.
-palette = palette[::-1]
-color_mapper = LinearColorMapper(palette = palette, low = 0, high = 40, nan_color = '#d9d9d9')
-p = figure(title = 'Share of adults who are obese, 2016', plot_height = 600 , plot_width = 950, toolbar_location = None)
-p.patches('xs','ys', source = df,fill_color = {'field' :'MEDIA', 'transform' : color_mapper},
-          line_color = 'black', line_width = 0.25, fill_alpha = 1)
-show(p)
 
 plt.clf()
 

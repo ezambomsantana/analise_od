@@ -1,3 +1,18 @@
+    var url = 'http://localhost:5002/mapa'
+    fetch( url, {
+        method: 'get'
+    }).then( function( response ) {
+        response.text()
+        .then(function(result){
+
+
+
+
+        }) 
+    }).catch( function( err ) {
+        // Error
+    });
+
 import plotly.plotly as py
 import plotly.graph_objs as go
 import plotly

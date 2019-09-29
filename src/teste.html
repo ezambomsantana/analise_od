@@ -39,12 +39,15 @@
 
     var subway = false;
     var distritos = false;
+    var pontos = false;
 
     var subwayLayer;
     var distritosLayer;
+    var pontosLayer;
 
-    var map = L.map('map').setView([37.8, -96], 4);
+    var map = L.map('map').setView([-23.5, -46.5], 8);
     var metro_data;
+    var pontos_data;
 
 	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 		maxZoom: 18,
@@ -215,12 +218,56 @@
 
     };
 
+
+    function initiate_pontos() {
+        if (pontos) {
+            pontos = false;
+            map.removeLayer(pontosLayer);
+            return;
+        }
+        pontos = true;
+        var url = 'http://localhost:5002/pontos'
+        fetch( url, {
+            method: 'get',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        }).then( function( response ) {
+            response.json()
+            .then(function(result){
+                pontos_data = JSON.parse(result)
+                show_pontos()
+            }) 
+        }).catch( function( err ) {
+            // Error
+        });     
+    }
+
+    function show_pontos() {
+        var markerArray = [];
+        console.log(pontos_data)
+        for (var prop in pontos_data) {
+        }
+        for (var i in pontos_data) {
+            position = pontos_data[i];
+            console.log(position)
+            markerArray.push(L.marker([position[1], position[0]]));
+        }
+
+        pontosLayer = L.featureGroup(markerArray).addTo(map);
+    }
+
+
+
+
 </script>
 
 Camadas:<br>
 
 <input type="checkbox" value="metro" onclick="initiate_subway()">Metrô</input><br>
 <input type="checkbox" value="metro" onclick="initiate_distritos()">Distritos</input><br>
+<input type="checkbox" value="metro" onclick="initiate_pontos()">Pontos</input><br>
 
 
 </body>

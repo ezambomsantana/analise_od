@@ -92,6 +92,7 @@ plt.savefig(folder_images_maps + 'tempo.png', bbox_inches='tight', pad_inches=0.
 
 #Read data to json.
 merged_json = json.loads(df.to_json())
+print(merged_json)
 #Convert to String like object.
 json_data = json.dumps(merged_json)
 geosource = GeoJSONDataSource(geojson = json_data)
