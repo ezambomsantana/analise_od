@@ -73,7 +73,8 @@
 	info.update = function (props) {
 		this._div.innerHTML = '<h4>Nome Distrito</h4>' +  (props ?
             '<b>' + props.NomeDistri + '</b><br>' +
-            '<b>Renda: '+ props.RENDA_FA +'</b>'
+            '<b>Renda: '+ props.RENDA_FA +'</b><br>' +
+            '<b>Distância: '+ props.MEDIA_DIST +'</b>'
             
             
             : 'Hover over a state');
@@ -99,9 +100,9 @@
             return {
                 weight: 2,
                 opacity: 1,
-                color: 'blue',
+                color: 'black',
                 dashArray: '3',
-                fillOpacity: 0.7,
+                fillOpacity: 0.5,
                 fillColor: '#FED976'
             };
         }
@@ -109,9 +110,9 @@
             return {
                 weight: 2,
                 opacity: 1,
-                color: 'blue',
+                color: 'black',
                 dashArray: '3',
-                fillOpacity: 0.7,
+                fillOpacity: 0.5,
                 fillColor: getColor(feature.properties.RENDA_FA)
             };
         }
@@ -119,9 +120,9 @@
             return {
                 weight: 2,
                 opacity: 1,
-                color: 'blue',
+                color: 'black',
                 dashArray: '3',
-                fillOpacity: 0.7,
+                fillOpacity: 0.5,
                 fillColor: getColor(feature.properties.MEDIA_DIST)
             };
         }

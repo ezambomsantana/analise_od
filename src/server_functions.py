@@ -45,8 +45,6 @@ def load_districts():
     data17['DX'] = data17['CO_D_X'].astype(int)
     data17['DY'] = data17['CO_D_Y'].astype(int)
     data17['DISTANCE'] = 0
-
-
     data17['DISTANCE'] = data17.apply(lambda x: calculate_distance(x), axis=1)
 
     csv_file = folder_data + "regioes17.csv"
