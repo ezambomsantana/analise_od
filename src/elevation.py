@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+import openrouteservice
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -10,6 +10,8 @@ import geopy.distance
 import utm
 from shapely.geometry import shape, LineString, Polygon
 
+teste = pd.read_csv('indices.csv', index_col=0)
+dict_routes = teste.to_dict('index')
 def calculate_weighted_mean(data):
     data['FE_VIA'] = data['FE_VIA'].apply(lambda x: 1 if math.isnan(x) else x)
     data['FE_VIA'] = data['FE_VIA'].apply(lambda x: 1 if int(x) == 0 else x)
@@ -29,7 +31,6 @@ data17['DX'] = data17['CO_D_X'].astype(int)
 data17['DY'] = data17['CO_D_Y'].astype(int)
 data17['DISTANCE'] = 0
 
-
 #filters
 
 data17_sp = data17[data17['MUNI_O'] == 36] # Only SP
@@ -46,7 +47,31 @@ def calculate_distance(row):
 data17_carros['DISTANCE'] = data17_carros.apply(lambda x: calculate_distance(x), axis=1)
 
 data_menor = data17_carros[data17_carros['DISTANCE'] >= 6000]
-print(data_menor['DISTANCE'])
-print(data_menor['FE_VIA'].sum())
+data_menor = data_menor.head(299)
+def calculate_distance_openservice(row):  
+    if row.name not in dict_routes.keys(): 
+        origin = utm.to_latlon(row['CO_O_X'],row['CO_O_Y'], 23, 'K')
+        dest = utm.to_latlon(row['CO_D_X'],row['CO_D_Y'], 23, 'K')
+
+        coords = ((origin[1],origin[0]), (dest[1], dest[0]))
+        print(coords)
+        client = openrouteservice.Client(key='5b3ce3597851110001cf62487c666649f7ce4159a0838804a41d090b') # Specify your personal API key
+        routes = client.directions(coords)
+        geometry = routes['routes'][0]['geometry']
+        elevs = client.elevation_line('encodedpolyline', geometry)
+        lista = elevs['geometry']['coordinates']
+        dist = routes['routes'][0]['segments'][0]['distance']
+        duration = routes['routes'][0]['segments'][0]['duration']
+        return (lista, dist, duration)
+
+data_menor['DISTANCE_LIST'] = data_menor.apply(lambda x: calculate_distance_openservice(x), axis=1)
+data_menor = data_menor.dropna(subset=['DISTANCE_LIST'])
+
+frame = data_menor[['DISTANCE_LIST']]
+print(frame)
+teste = teste.append(frame)
+print(teste)
+
+teste.to_csv('indices.csv')
 
 
