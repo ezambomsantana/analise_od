@@ -41,6 +41,9 @@
     var distritos = false;
     var pontos = false;
 
+    var renda = false;
+    var distancia = false;
+
     var subwayLayer;
     var distritosLayer;
     var pontosLayer;
@@ -69,7 +72,11 @@
 
 	info.update = function (props) {
 		this._div.innerHTML = '<h4>Nome Distrito</h4>' +  (props ?
-			'<b>' + props.NomeDistri + '</b>' : 'Hover over a state');
+            '<b>' + props.NomeDistri + '</b><br>' +
+            '<b>Renda: '+ props.RENDA_FA +'</b>'
+            
+            
+            : 'Hover over a state');
 	};
 
 	info.addTo(map);
@@ -77,25 +84,49 @@
 
 	// get color depending on population density value
 	function getColor(d) {
-		return d > 1000 ? '#800026' :
-				d > 500  ? '#BD0026' :
-				d > 200  ? '#E31A1C' :
-				d > 100  ? '#FC4E2A' :
-				d > 50   ? '#FD8D3C' :
+		return d > 10000 ? '#800026' :
+				d > 8000  ? '#BD0026' :
+				d > 6000  ? '#E31A1C' :
+				d > 4000  ? '#FC4E2A' :
+				d > 2000   ? '#FD8D3C' :
 				d > 20   ? '#FEB24C' :
 				d > 10   ? '#FED976' :
 							'#FFEDA0';
 	}
 
 	function style(feature) {
-		return {
-			weight: 2,
-			opacity: 1,
-			color: 'blue',
-			dashArray: '3',
-			fillOpacity: 0.7,
-			fillColor: getColor(feature.properties.density)
-		};
+        if (!renda && !distancia) {
+            return {
+                weight: 2,
+                opacity: 1,
+                color: 'blue',
+                dashArray: '3',
+                fillOpacity: 0.7,
+                fillColor: '#FED976'
+            };
+        }
+        if (renda) {
+            return {
+                weight: 2,
+                opacity: 1,
+                color: 'blue',
+                dashArray: '3',
+                fillOpacity: 0.7,
+                fillColor: getColor(feature.properties.RENDA_FA)
+            };
+        }
+        if (distancia) {
+            return {
+                weight: 2,
+                opacity: 1,
+                color: 'blue',
+                dashArray: '3',
+                fillOpacity: 0.7,
+                fillColor: getColor(feature.properties.MEDIA_DIST)
+            };
+        }
+
+
     }
     
     function style_subway(feature) {
@@ -258,6 +289,13 @@
         pontosLayer = L.featureGroup(markerArray).addTo(map);
     }
 
+    function change_renda() {
+        renda = !renda;
+    }
+
+    function change_distancia() {
+        distancia = !distancia;
+    }
 
 
 
@@ -267,6 +305,8 @@ Camadas:<br>
 
 <input type="checkbox" value="metro" onclick="initiate_subway()">Metrô</input><br>
 <input type="checkbox" value="metro" onclick="initiate_distritos()">Distritos</input><br>
+&nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_renda()">Renda</input><br>
+&nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_distancia()">Distância</input><br>
 <input type="checkbox" value="metro" onclick="initiate_pontos()">Pontos</input><br>
 
 

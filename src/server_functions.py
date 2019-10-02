@@ -93,6 +93,7 @@ def load_districts():
     df = mapa.set_index('NomeDistri').join(data_mp).join(data_mp2).join(data_renda).join(data_trans).join(data_mp_dist)
     df['MEDIA'] = df['MP'] / df['FE_VIA']
     df['MEDIA_DIST'] = df['MP_DIST'] / df['FE_VIA']
+    df = df.reset_index()
     return df
 
 def load_subway():
