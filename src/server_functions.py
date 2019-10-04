@@ -18,17 +18,7 @@ def calculate_weighted_mean(data):
 
 def load_districts(vehicle):
     mapa = gpd.GeoDataFrame.from_file("/home/eduardo/Distritos_2017_region.shp", encoding='latin-1')
-
-    geos = []
-    for index, row in mapa.iterrows():
-        pairs = row['geometry']
-        lista = []
-        if (isinstance(pairs, Polygon)):
-            for pair in pairs.exterior.coords:
-                dest = utm.to_latlon(pair[0],pair[1], 23, 'K')
-                lista.append((dest[1],dest[0]))
-        geos.append(Polygon(lista))
-    mapa['geometry'] = geos
+    mapa = mapa.to_crs({"init": "epsg:4326"})
 
     folder_data = "/home/eduardo/dev/analise_od/data/"
     arq17 = "dados17_distance.csv"
@@ -91,15 +81,8 @@ def load_districts(vehicle):
 
 def load_subway():
     metro = gpd.GeoDataFrame.from_file("/home/eduardo/SIRGAS_SHP_linhametro_line.shp", encoding='latin-1')
-    geos = []
-    for index, row in metro.iterrows():
-        pairs = row['geometry']
-        lista = []
-        for pair in pairs.coords:
-            dest = utm.to_latlon(pair[0],pair[1], 23, 'K')
-            lista.append((dest[1],dest[0]))
-        geos.append(LineString(lista))
-    metro['geometry'] = geos
+    metro.crs = {'init' :'epsg:22523'}
+    metro = metro.to_crs({"init": "epsg:4326"})
     return metro
 
 def load_data17():

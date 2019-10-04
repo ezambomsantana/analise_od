@@ -7,7 +7,7 @@ from server_functions import load_districts, load_subway, load_data17
 app = Flask(__name__)
 api = Api(app)
 
-mapa = load_districts()
+mapa = load_districts(0)
 
 metro = load_subway()
 
@@ -15,14 +15,14 @@ data17 = load_data17()
 
 class Metro(Resource):
     def get(self):
-        args = request.args
-        print (args)
-        print(args['teste'])
         return metro.to_json()
 
 
 class Distritos(Resource):
     def get(self):
+        args = request.args
+        vehicle_type = args['vehicleType']
+        mapa = load_districts(vehicle_type)
         return mapa.to_json()
 
 class Pontos(Resource):
