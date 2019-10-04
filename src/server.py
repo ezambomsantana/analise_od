@@ -15,6 +15,9 @@ data17 = load_data17()
 
 class Metro(Resource):
     def get(self):
+        args = request.args
+        print (args)
+        print(args['teste'])
         return metro.to_json()
 
 

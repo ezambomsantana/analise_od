@@ -13,8 +13,6 @@ import plotly.graph_objs as go
 import plotly
 import mplleaflet
 
-
-
 import re
 from pyproj import Proj, transform
 
