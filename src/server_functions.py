@@ -25,11 +25,6 @@ def load_districts(vehicle):
 
     data17 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=",", low_memory=False) 
     data17 = data17.dropna(subset=['CO_O_X'])
-    
-    data17['OX'] = data17['CO_O_X'].astype(int)
-    data17['OY'] = data17['CO_O_Y'].astype(int)
-    data17['DX'] = data17['CO_D_X'].astype(int)
-    data17['DY'] = data17['CO_D_Y'].astype(int)
 
     csv_file = folder_data + "regioes17.csv"
     mydict = []
@@ -46,8 +41,7 @@ def load_districts(vehicle):
     
     if vehicle != "0":
         data17 = data17[data17['MODOPRIN'] == int(vehicle)]
-    print(data17['MODOPRIN'])
-
+        
     coletivo = ['onibus','trem','metro']
     privado = ['carro-dirigindo','moto','bicicleta','taxi']
 
