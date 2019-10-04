@@ -19,7 +19,7 @@ def calculate_weighted_mean(data):
     data['MP_DIST'] = data['FE_VIA'] * data['DISTANCE']
     return data
 
-folder_data = "/Users/eduardosantana/pesquisa/analise_od/data/"
+folder_data = "/home/eduardo/dev/analise_od/data/"
 folder_images_maps = "/Users/eduardosantana/pesquisa/analise_od/images/maps/"
 arq17 = "dados17.csv"
 
@@ -47,22 +47,28 @@ def calculate_distance(row):
 data17_carros['DISTANCE'] = data17_carros.apply(lambda x: calculate_distance(x), axis=1)
 
 data_menor = data17_carros[data17_carros['DISTANCE'] >= 6000]
-data_menor = data_menor.head(890)
+data_menor = data_menor.head(1490)
 def calculate_distance_openservice(row):  
     if row.name not in dict_routes.keys(): 
-        origin = utm.to_latlon(row['CO_O_X'],row['CO_O_Y'], 23, 'K')
-        dest = utm.to_latlon(row['CO_D_X'],row['CO_D_Y'], 23, 'K')
+        try:
 
-        coords = ((origin[1],origin[0]), (dest[1], dest[0]))
-        print(coords)
-        client = openrouteservice.Client(key='5b3ce3597851110001cf62483b85c67b106043d7a9c9921f6ec0a945') # Specify your personal API key
-        routes = client.directions(coords)
-        geometry = routes['routes'][0]['geometry']
-        elevs = client.elevation_line('encodedpolyline', geometry)
-        lista = elevs['geometry']['coordinates']
-        dist = routes['routes'][0]['segments'][0]['distance']
-        duration = routes['routes'][0]['segments'][0]['duration']
-        return (lista, dist, duration)
+            origin = utm.to_latlon(row['CO_O_X'],row['CO_O_Y'], 23, 'K')
+            dest = utm.to_latlon(row['CO_D_X'],row['CO_D_Y'], 23, 'K')
+
+            coords = ((origin[1],origin[0]), (dest[1], dest[0]))
+            print(coords)
+            client = openrouteservice.Client(key='5b3ce3597851110001cf62487c666649f7ce4159a0838804a41d090b') # Specify your personal API key
+            routes = client.directions(coords)
+            geometry = routes['routes'][0]['geometry']
+            elevs = client.elevation_line('encodedpolyline', geometry)
+            lista = elevs['geometry']['coordinates']
+            dist = routes['routes'][0]['segments'][0]['distance']
+            duration = routes['routes'][0]['segments'][0]['duration']
+            return (lista, dist, duration)
+
+        except:
+            print("An exception occurred")
+            return ''
 
 data_menor['DISTANCE_LIST'] = data_menor.apply(lambda x: calculate_distance_openservice(x), axis=1)
 data_menor = data_menor.dropna(subset=['DISTANCE_LIST'])
