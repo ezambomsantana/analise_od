@@ -9,11 +9,6 @@ import geopy.distance
 import utm
 from shapely.geometry import shape, LineString, Polygon
 
-def calculate_distance(row):  
-    origin = utm.to_latlon(row['CO_O_X'],row['CO_O_Y'], 23, 'K')
-    dest = utm.to_latlon(row['CO_D_X'],row['CO_D_Y'], 23, 'K')
-    return geopy.distance.geodesic(origin, dest).meters
-
 def calculate_weighted_mean(data):
     data['FE_VIA'] = data['FE_VIA'].apply(lambda x: 1 if math.isnan(x) else x)
     data['FE_VIA'] = data['FE_VIA'].apply(lambda x: 1 if int(x) == 0 else x)
@@ -21,8 +16,8 @@ def calculate_weighted_mean(data):
     data['MP_DIST'] = data['FE_VIA'] * data['DISTANCE']
     return data
 
-def load_districts():
-    mapa = gpd.GeoDataFrame.from_file("/Users/eduardosantana/anexos/Distritos_2017_region.shp", encoding='latin-1')
+def load_districts(vehicle):
+    mapa = gpd.GeoDataFrame.from_file("/home/eduardo/Distritos_2017_region.shp", encoding='latin-1')
 
     geos = []
     for index, row in mapa.iterrows():
@@ -35,17 +30,16 @@ def load_districts():
         geos.append(Polygon(lista))
     mapa['geometry'] = geos
 
-    folder_data = "/Users/eduardosantana/pesquisa/analise_od/data/"
-    arq17 = "dados17.csv"
+    folder_data = "/home/eduardo/dev/analise_od/data/"
+    arq17 = "dados17_distance.csv"
 
-    data17 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=";", low_memory=False) 
+    data17 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=",", low_memory=False) 
     data17 = data17.dropna(subset=['CO_O_X'])
+    
     data17['OX'] = data17['CO_O_X'].astype(int)
     data17['OY'] = data17['CO_O_Y'].astype(int)
     data17['DX'] = data17['CO_D_X'].astype(int)
     data17['DY'] = data17['CO_D_Y'].astype(int)
-    data17['DISTANCE'] = 0
-    data17['DISTANCE'] = data17.apply(lambda x: calculate_distance(x), axis=1)
 
     csv_file = folder_data + "regioes17.csv"
     mydict = []
@@ -60,14 +54,15 @@ def load_districts():
     data17 = calculate_weighted_mean(data17)
     modos17 = {0:'outros',1:'metro',2:'trem',3:'metro',4:'onibus',5:'onibus',6:'onibus',7:'fretado', 8:'escolar',9:'carro-dirigindo', 10: 'carro-passageiro', 11:'taxi', 12:'taxi-nao-convencional', 13:'moto', 14:'moto-passageiro', 15:'bicicleta', 16:'pe', 17: 'outros'}
     
+    if vehicle != "0":
+        data17 = data17[data17['MODOPRIN'] == int(vehicle)]
+    print(data17['MODOPRIN'])
+
     coletivo = ['onibus','trem','metro']
     privado = ['carro-dirigindo','moto','bicicleta','taxi']
 
     motorizado = ['onibus','trem','metro', 'carro-dirigindo','moto','taxi']
     nao_motorizado = ['bicicleta', 'pe']
-
-    data17['MODOPRIN'] = data17['MODOPRIN'].replace(modos17)
-    data17 = data17[data17['MODOPRIN'].isin(coletivo + privado)] 
 
     data17 = data17[data17['H_SAIDA'] >= 5]
     data17 = data17[data17['H_SAIDA'] <= 10]
@@ -95,7 +90,7 @@ def load_districts():
     return df
 
 def load_subway():
-    metro = gpd.GeoDataFrame.from_file("/Users/eduardosantana/anexos/SIRGAS_SHP_linhametro_line.shp", encoding='latin-1')
+    metro = gpd.GeoDataFrame.from_file("/home/eduardo/SIRGAS_SHP_linhametro_line.shp", encoding='latin-1')
     geos = []
     for index, row in metro.iterrows():
         pairs = row['geometry']
@@ -108,7 +103,7 @@ def load_subway():
     return metro
 
 def load_data17():
-    folder_data = "/Users/eduardosantana/pesquisa/analise_od/data/"
+    folder_data = "/home/eduardo/dev/analise_od/data/"
     arq17 = "dados17.csv"
 
     data17 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=";", low_memory=False) 

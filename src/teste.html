@@ -51,6 +51,7 @@
     var map = L.map('map').setView([-23.5, -46.5], 8);
     var metro_data;
     var pontos_data;
+    var vehicle_type = 0;
 
 	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 		maxZoom: 18,
@@ -168,8 +169,9 @@
             map.removeLayer(distritosLayer);
             return;
         }
+        vehicle_type = document.getElementById('vehicle_type').value
         distritos = true;
-        var url = 'http://localhost:5002/distritos'
+        var url = 'http://localhost:5002/distritos?vehicleType=' + vehicle_type
         fetch( url, {
             method: 'get',
             headers: {
@@ -235,7 +237,7 @@
             response.json()
             .then(function(result){
                 metro_data = JSON.parse(result)
-                show_metro()()
+                show_metro()
             }) 
         }).catch( function( err ) {
             // Error
@@ -308,6 +310,8 @@ Camadas:<br>
 <input type="checkbox" value="metro" onclick="initiate_distritos()">Distritos</input><br>
 &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_renda()">Renda</input><br>
 &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_distancia()">Distância</input><br>
+&nbsp;&nbsp;&nbsp;Vehicle<input type="text" id="vehicle_type" value=0 ></input><br>
+
 <input type="checkbox" value="metro" onclick="initiate_pontos()">Pontos</input><br>
 
 
