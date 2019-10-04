@@ -39,8 +39,16 @@ def load_districts(vehicle):
     data17 = calculate_weighted_mean(data17)
     modos17 = {0:'outros',1:'metro',2:'trem',3:'metro',4:'onibus',5:'onibus',6:'onibus',7:'fretado', 8:'escolar',9:'carro-dirigindo', 10: 'carro-passageiro', 11:'taxi', 12:'taxi-nao-convencional', 13:'moto', 14:'moto-passageiro', 15:'bicicleta', 16:'pe', 17: 'outros'}
     
+
     if vehicle != "0":
-        data17 = data17[data17['MODOPRIN'] == int(vehicle)]
+        print(vehicle)
+
+        vehicles = vehicle.split(",")
+        print(vehicles)
+        vehicles_int = []
+        for v in vehicles:
+            vehicles_int.append(int(v))
+        data17 = data17[data17['MODOPRIN'].isin(vehicles_int)] 
         
     coletivo = ['onibus','trem','metro']
     privado = ['carro-dirigindo','moto','bicicleta','taxi']

@@ -7,7 +7,7 @@ from server_functions import load_districts, load_subway, load_data17
 app = Flask(__name__)
 api = Api(app)
 
-mapa = load_districts(0)
+mapa = load_districts("0")
 
 metro = load_subway()
 
