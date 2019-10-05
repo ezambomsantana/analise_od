@@ -98,3 +98,13 @@ body {
     border-color: transparent;
     box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
   }
+
+#map {
+   width: 60%;
+   height: 600px;
+}
+
+#filters {
+    width: 40%;
+    padding-left: 2%;
+ }
