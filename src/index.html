@@ -13,21 +13,6 @@
   <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
     integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
     crossorigin=""></script>
-
-
-  <style>
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-    }
-
-    #map {
-      width: 60%;
-      height: 600px;
-    }
-  </style>
-
   <title>Template de dashboard, usando Bootstrap.</title>
 
   <!-- Principal CSS do Bootstrap -->
@@ -151,6 +136,7 @@
             Camadas:</br>
 
             <input type="checkbox" value="metro" onclick="initiate_subway()">Metrô</input></br>
+            <input type="checkbox" value="metro" onclick="initiate_cptm()">CPTM</input></br>
             <input type="checkbox" value="metro" onclick="initiate_distritos()">Distritos</input></br>
             &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_renda()">Renda</input></br>
             &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_distancia()">Distância</input></br>
@@ -184,6 +170,15 @@
                 <option value="17">17 - Outros</option>
               </select>
             </div>
+
+            <div class="form-group">
+                <label for="exampleFormControlSelect2">Gênero</label>
+                <select class="form-control" id="sexo">
+                  <option value="0" selectedn>Todos</option>
+                  <option value="1">01 - Masculino</option>
+                  <option value="2">02 - Feminino</option>
+                </select>
+              </div>
           </div>
         </div>
         
@@ -384,6 +379,7 @@
   <script type="text/javascript">
 
     var subway = false;
+    var cptm = false;
     var distritos = false;
     var pontos = false;
 
@@ -399,7 +395,6 @@
     var map = L.map('map').setView([-23.5, -46.5], 8);
     var metro_data;
     var pontos_data;
-    var vehicle_type = 0;
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
       maxZoom: 18,
@@ -510,6 +505,14 @@
         fillOpacity: 1
       };
     }
+
+    function style_cptm(feature) {
+      return {
+        opacity: 1,
+        color: 'blue',
+        fillOpacity: 1
+      };
+    }    
 
     function highlightFeature(e) {
       var layer = e.target;
@@ -626,6 +629,39 @@
 
     };
 
+
+    function initiate_cptm() {
+      if (cptm) {
+        cptm = false;
+        map.removeLayer(cptmLayer);
+        return;
+      }
+      cptm = true;
+      var url = 'http://localhost:5002/cptm'
+      fetch(url, {
+        method: 'get',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then(function (response) {
+        response.json()
+          .then(function (result) {
+            cptm_data = JSON.parse(result)
+            show_cptm()
+          })
+      }).catch(function (err) {
+        // Error
+      });
+    }
+
+    function show_cptm() {
+      subwayLayer = L.geoJson(cptm_data, {
+        style: style_cptm
+      }).addTo(map);
+
+
+    };
 
     function initiate_pontos() {
       if (pontos) {

@@ -51,7 +51,6 @@ def load_districts(vehicle):
 
     data17_copy = data17_copy[data17_copy['H_SAIDA'] >= 5]
     data17_copy = data17_copy[data17_copy['H_SAIDA'] <= 10]
-
     
     data_mp2 = data17_copy[['NOME_O',  'MP']].groupby(['NOME_O']).sum().sort_values(by=['MP']).reset_index()
     data_mp2 = data_mp2.set_index('NOME_O')
@@ -79,6 +78,13 @@ def load_subway():
     metro.crs = {'init' :'epsg:22523'}
     metro = metro.to_crs({"init": "epsg:4326"})
     return metro
+
+def load_cptm():
+    cptm = gpd.GeoDataFrame.from_file("/home/eduardo/SIRGAS_SHP_linhatrem_line.shp", encoding='latin-1')
+    cptm.crs = {'init' :'epsg:22523'}
+    cptm = cptm.to_crs({"init": "epsg:4326"})
+    return cptm
+
 
 def load_data17():
     folder_data = "/home/eduardo/dev/analise_od/data/"
