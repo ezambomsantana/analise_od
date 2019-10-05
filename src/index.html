@@ -23,7 +23,7 @@
     }
 
     #map {
-      width: 80%;
+      width: 60%;
       height: 600px;
     }
   </style>
@@ -154,6 +154,7 @@
             <input type="checkbox" value="metro" onclick="initiate_distritos()">Distritos</input></br>
             &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_renda()">Renda</input></br>
             &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_distancia()">Distância</input></br>
+            &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_tempo()">Tempo</input></br>
 
             <input type="checkbox" value="metro" onclick="initiate_pontos()">Pontos</input></br>
 
@@ -162,16 +163,39 @@
             <div class="form-group">
               <label for="exampleFormControlSelect2">Tipos de Veículos</label>
               <select multiple class="form-control" id="vehicles">
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-                <option>5</option>
+                <option value="1">01 - Metrô</option>
+                <option value="2">02 - Trem</option>
+                <option value="3">03 - Monotrilho</option>
+                <option value="4">04 - Ônibus/micro-ônibus/perua do município de São Paulo</option>
+                <option value="5">05 - Ônibus/micro-ônibus/perua de outros municípios</option>
+                <option value="6">06 - Ônibus/micro-ônibus/perua metropolitano</option>
+                <option value="7">07 - Transporte Fretado</option>
+                <option value="8">08 - Transporte Escolar</option>
+                <option value="9">09 - Dirigindo Automóvel</option>
+                <option value="10">10 - Passageiro de Automóvel</option>
+                <option value="11">11 - Táxi Convencional</option>
+                <option value="12">12 - Táxi não Convencional</option>
+                <option value="13">13 - Dirigindo Moto</option>
+                <option value="14">14 - Passageiro de Moto</option>
+                <option value="15">15 - Bicicleta</option>
+                <option value="16">16 - A Pé</option>
+                <option value="17">17 - Outros</option>
               </select>
             </div>
           </div>
         </div>
-
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
 
         <div class="table-responsive">
@@ -363,6 +387,7 @@
 
     var renda = false;
     var distancia = false;
+    var tempo = false;
 
     var subwayLayer;
     var distritosLayer;
@@ -397,9 +422,6 @@
         '<b>Renda: ' + props.RENDA_FA + '</b><br>' +
         '<b>Distância: ' + props.MEDIA_DIST + '</b><br>' +
         '<b>Tempo: ' + props.MEDIA + '</b>'
-        
-
-
         : 'Hover over a state');
     };
 
@@ -437,6 +459,16 @@
           dashArray: '3',
           fillOpacity: 0.5,
           fillColor: getColor(feature.properties.RENDA_FA)
+        };
+      }
+      if (tempo) {
+        return {
+          weight: 2,
+          opacity: 1,
+          color: 'black',
+          dashArray: '3',
+          fillOpacity: 0.5,
+          fillColor: getColor(feature.properties.MEDIA)
         };
       }
       if (distancia) {
@@ -622,6 +654,10 @@
 
     function change_distancia() {
       distancia = !distancia;
+    }
+
+    function change_distancia() {
+      tempo = !tempo;
     }
 
   </script>
