@@ -545,9 +545,10 @@
         return;
       }
       var elements = Array.from(document.getElementById('vehicles').selectedOptions).map(v=>v.value);
-
+      var sexo = document.getElementById('sexo').value;
+      alert(sexo)
       distritos = true;
-      var url = 'http://localhost:5002/distritos?vehicleType=' + elements
+      var url = 'http://localhost:5002/distritos?vehicleType=' + elements + '&sexo=' + sexo
       fetch(url, {
         method: 'get',
         headers: {

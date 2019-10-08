@@ -38,7 +38,7 @@ data17['NUM_TRANS'] = data17[['MODO1', 'MODO2','MODO3','MODO4']].count(axis=1)
 
 data17 = calculate_weighted_mean(data17)
 
-def load_districts(vehicle):
+def load_districts(vehicle, sexo):
 
     data17_copy = data17
 
@@ -48,6 +48,10 @@ def load_districts(vehicle):
         for v in vehicles:
             vehicles_int.append(int(v))
         data17_copy = data17_copy[data17_copy['MODOPRIN'].isin(vehicles_int)] 
+
+    if sexo != "0":
+        data17_copy = data17_copy[data17_copy['SEXO'].isin([int(sexo)])]
+    print(data17_copy['SEXO']) 
 
     data17_copy = data17_copy[data17_copy['H_SAIDA'] >= 5]
     data17_copy = data17_copy[data17_copy['H_SAIDA'] <= 10]
