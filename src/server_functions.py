@@ -38,7 +38,7 @@ data17['NUM_TRANS'] = data17[['MODO1', 'MODO2','MODO3','MODO4']].count(axis=1)
 
 data17 = calculate_weighted_mean(data17)
 
-def load_districts(vehicle, sexo):
+def load_districts(vehicle, sexo, horarioInicio, horarioFim):
 
     data17_copy = data17
 
@@ -51,10 +51,12 @@ def load_districts(vehicle, sexo):
 
     if sexo != "0":
         data17_copy = data17_copy[data17_copy['SEXO'].isin([int(sexo)])]
-    print(data17_copy['SEXO']) 
 
-    data17_copy = data17_copy[data17_copy['H_SAIDA'] >= 5]
-    data17_copy = data17_copy[data17_copy['H_SAIDA'] <= 10]
+    if horarioInicio != "0":
+        data17_copy = data17_copy[data17_copy['H_SAIDA'] >= int(horarioInicio)]
+
+    if horarioFim != "0":
+        data17_copy = data17_copy[data17_copy['H_SAIDA'] <= int(horarioFim)]
     
     data_mp2 = data17_copy[['NOME_O',  'MP']].groupby(['NOME_O']).sum().sort_values(by=['MP']).reset_index()
     data_mp2 = data_mp2.set_index('NOME_O')
