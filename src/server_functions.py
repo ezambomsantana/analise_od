@@ -38,7 +38,7 @@ data17['NUM_TRANS'] = data17[['MODO1', 'MODO2','MODO3','MODO4']].count(axis=1)
 
 data17 = calculate_weighted_mean(data17)
 
-def load_districts(vehicle, sexo, horarioInicio, horarioFim):
+def load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
 
     data17_copy = data17
 
@@ -57,21 +57,26 @@ def load_districts(vehicle, sexo, horarioInicio, horarioFim):
 
     if horarioFim != "0":
         data17_copy = data17_copy[data17_copy['H_SAIDA'] <= int(horarioFim)]
+
+    print(data17_copy['NOME_O'] )
+    if origin != "0":
+        data17_copy = data17_copy[data17_copy['NOME_O'] == origin]
     
-    data_mp2 = data17_copy[['NOME_O',  'MP']].groupby(['NOME_O']).sum().sort_values(by=['MP']).reset_index()
-    data_mp2 = data_mp2.set_index('NOME_O')
 
-    data_mp_dist = data17_copy[['NOME_O',  'MP_DIST']].groupby(['NOME_O']).sum().sort_values(by=['MP_DIST']).reset_index()
-    data_mp_dist = data_mp_dist.set_index('NOME_O')
+    data_mp2 = data17_copy[[orde,  'MP']].groupby([orde]).sum().sort_values(by=['MP']).reset_index()
+    data_mp2 = data_mp2.set_index(orde)
 
-    data_mp = data17_copy[['NOME_O', 'MUNI_O', 'FE_VIA']].groupby(['NOME_O','MUNI_O']).sum().sort_values(by=['NOME_O']).reset_index()
-    data_mp = data_mp.set_index('NOME_O')
+    data_mp_dist = data17_copy[[orde,  'MP_DIST']].groupby([orde]).sum().sort_values(by=['MP_DIST']).reset_index()
+    data_mp_dist = data_mp_dist.set_index(orde)
 
-    data_renda = data17_copy[['NOME_O', 'RENDA_FA']].groupby(['NOME_O']).mean().sort_values(by=['RENDA_FA']).reset_index()
-    data_renda = data_renda.set_index('NOME_O')
+    data_mp = data17_copy[[orde, 'MUNI_O', 'FE_VIA']].groupby([orde,'MUNI_O']).sum().sort_values(by=[orde]).reset_index()
+    data_mp = data_mp.set_index(orde)
 
-    data_trans = data17_copy[['NOME_O', 'NUM_TRANS']].groupby(['NOME_O']).mean().sort_values(by=['NUM_TRANS']).reset_index()
-    data_trans = data_trans.set_index('NOME_O')
+    data_renda = data17_copy[[orde, 'RENDA_FA']].groupby([orde]).mean().sort_values(by=['RENDA_FA']).reset_index()
+    data_renda = data_renda.set_index(orde)
+
+    data_trans = data17_copy[[orde, 'NUM_TRANS']].groupby([orde]).mean().sort_values(by=['NUM_TRANS']).reset_index()
+    data_trans = data_trans.set_index(orde)
 
     df = mapa.set_index('NomeDistri').join(data_mp).join(data_mp2).join(data_renda).join(data_trans).join(data_mp_dist)
     df['MEDIA'] = df['MP'] / df['FE_VIA']
