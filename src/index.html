@@ -86,6 +86,7 @@
             <input type="checkbox" value="metro" onclick="initiate_graph()">Grafo</input></br>
             <input type="checkbox" value="metro" onclick="initiate_subway()">Metrô</input></br>
             <input type="checkbox" value="metro" onclick="initiate_cptm()">CPTM</input></br>
+            <input type="checkbox" value="metro" onclick="initiate_curitiba()">Curitiba</input></br>
             <input type="checkbox" value="metro" onclick="initiate_distritos()">Distritos</input></br>
             &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_renda()">Renda</input></br>
             &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_distancia()">Distância</input></br>
@@ -321,6 +322,7 @@
     var distritos = false;
     var pontos = false;
     var graph = false;
+    var curitiba = false;
 
     var renda = false;
     var distancia = false;
@@ -332,6 +334,8 @@
     var pontosLayer;
     var graphLayer;
     var cptmLayer;
+    var curitibaLayer;
+
 
     var map = L.map('map').setView([-23.5, -46.5], 8);
     var metro_data;
@@ -748,6 +752,40 @@
     function change_quantidade() {
       quantidade = !quantidade;
     }
+
+
+    function initiate_curitiba() {
+      if (curitiba) {
+        curitiba = false;
+        map.removeLayer(curitibaLayer);
+        return;
+      }
+      curitiba = true;
+      var url = 'http://localhost:5002/curitiba'
+      fetch(url, {
+        method: 'get',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then(function (response) {
+        response.json()
+          .then(function (result) {
+            curitiba_data = JSON.parse(result)
+            show_curitiba()
+          })
+      }).catch(function (err) {
+        // Error
+      });
+    }
+
+    function show_curitiba() {
+      curitibaLayer = L.geoJson(curitiba_data, {
+        style: style
+      }).addTo(map);
+
+
+    };
 
   </script>
 

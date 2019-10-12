@@ -2,7 +2,7 @@
 from flask import Flask, request
 from flask_restful import Resource, Api
 import json
-from server_functions import load_districts, load_subway, load_data17, load_cptm, load_graph
+from server_functions import load_districts, load_subway, load_data17, load_cptm, load_graph, load_curitiba 
 
 app = Flask(__name__)
 api = Api(app)
@@ -52,11 +52,17 @@ class Graph(Resource):
         mapa = load_graph(vehicle_type, sexo, horarioInicio, horarioFim, origin, orde)
         return mapa.to_json()
 
+
+class Curitiba(Resource):
+    def get(self):
+        return load_curitiba().to_json()        
+
 api.add_resource(Metro, '/metro')
 api.add_resource(Distritos, '/distritos') 
 api.add_resource(Pontos, '/pontos')
 api.add_resource(CPTM, '/cptm')
 api.add_resource(Graph, '/grafo')
+api.add_resource(Curitiba, '/curitiba')
 
 
 if __name__ == '__main__':

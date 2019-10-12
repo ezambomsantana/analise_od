@@ -129,3 +129,11 @@ def load_graph(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
     grafo = gpd.GeoDataFrame(frame)
     print(grafo)
     return grafo
+
+def load_curitiba():
+    curitiba = gpd.GeoDataFrame.from_file("/home/eduardo/DIVISA_DE_REGIONAIS/DIVISA_DE_REGIONAIS.shp", encoding='latin-1')
+    curitiba.crs = {'init' :'epsg:22522'}
+    curitiba = curitiba.to_crs({"init": "epsg:4326"})
+    print(curitiba)
+    return curitiba
+load_curitiba()
