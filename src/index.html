@@ -83,6 +83,7 @@
 
             Camadas:</br>
 
+            <input type="checkbox" value="metro" onclick="initiate_graph()">Grafo</input></br>
             <input type="checkbox" value="metro" onclick="initiate_subway()">Metrô</input></br>
             <input type="checkbox" value="metro" onclick="initiate_cptm()">CPTM</input></br>
             <input type="checkbox" value="metro" onclick="initiate_distritos()">Distritos</input></br>
@@ -319,6 +320,7 @@
     var cptm = false;
     var distritos = false;
     var pontos = false;
+    var graph = false;
 
     var renda = false;
     var distancia = false;
@@ -328,10 +330,13 @@
     var subwayLayer;
     var distritosLayer;
     var pontosLayer;
+    var graphLayer;
+    var cptmLayer;
 
     var map = L.map('map').setView([-23.5, -46.5], 8);
     var metro_data;
     var pontos_data;
+
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
       maxZoom: 18,
@@ -594,6 +599,37 @@
 
     };
 
+    function initiate_graph() {
+      if (graph) {
+        graph = false;
+        map.removeLayer(graphLayer);
+        return;
+      }
+      graph = true;
+      var url = 'http://localhost:5002/grafo'
+      fetch(url, {
+        method: 'get',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then(function (response) {
+        response.json()
+          .then(function (result) {
+            graph_data = JSON.parse(result)
+            show_graph()
+          })
+      }).catch(function (err) {
+        // Error
+      });
+    }
+
+    function show_graph() {
+      graphLayer = L.geoJson(graph_data, {
+        style: style_subway
+      }).addTo(map);
+    };
+
 
     function initiate_cptm() {
       if (cptm) {
@@ -621,7 +657,7 @@
     }
 
     function show_cptm() {
-      subwayLayer = L.geoJson(cptm_data, {
+      cptmLayer = L.geoJson(cptm_data, {
         style: style_cptm
       }).addTo(map);
 

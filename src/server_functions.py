@@ -111,3 +111,10 @@ def load_data17():
         geos.append((dest[1],dest[0]))
     data17['coords'] = geos
     return data17
+
+def load_graph(origin):
+    origin = mapa['geometry'].iloc[0].centroid
+    dest = mapa['geometry'].iloc[1].centroid
+
+    line = LineString([origin, dest])
+    return gpd.GeoSeries([line])
