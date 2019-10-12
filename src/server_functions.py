@@ -17,15 +17,17 @@ def calculate_weighted_mean(data):
     data['MP_DIST'] = data['FE_VIA'] * data['DISTANCE']
     return data
 
-mapa = gpd.GeoDataFrame.from_file("/home/eduardo/Distritos_2017_region.shp", encoding='latin-1')
+mapa = gpd.GeoDataFrame.from_file("../data/shapes/Distritos_2017_region.shp", encoding='latin-1')
 mapa = mapa.to_crs({"init": "epsg:4326"})
 mapa['NomeDistri'] = mapa['NomeDistri'].apply(lambda x: unidecode.unidecode(x))
 
-folder_data = "/home/eduardo/dev/analise_od/data/"
+folder_data = "../data/"
 arq17 = "dados17_distance.csv"
 
 data17 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=",", low_memory=False) 
 data17 = data17.dropna(subset=['CO_O_X'])
+
+print(data17)
 
 csv_file = folder_data + "regioes17.csv"
 mydict = []
@@ -85,32 +87,32 @@ def load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
     return df
 
 def load_subway():
-    metro = gpd.GeoDataFrame.from_file("/home/eduardo/SIRGAS_SHP_linhametro_line.shp", encoding='latin-1')
+    metro = gpd.GeoDataFrame.from_file("../data/shapes//SIRGAS_SHP_linhametro_line.shp", encoding='latin-1')
     metro.crs = {'init' :'epsg:22523'}
     metro = metro.to_crs({"init": "epsg:4326"})
     return metro
 
 def load_cptm():
-    cptm = gpd.GeoDataFrame.from_file("/home/eduardo/SIRGAS_SHP_linhatrem_line.shp", encoding='latin-1')
+    cptm = gpd.GeoDataFrame.from_file("../data/shapes//SIRGAS_SHP_linhatrem_line.shp", encoding='latin-1')
     cptm.crs = {'init' :'epsg:22523'}
     cptm = cptm.to_crs({"init": "epsg:4326"})
     return cptm
 
 
 def load_data17():
-    folder_data = "/home/eduardo/dev/analise_od/data/"
+    folder_data = "../data/"
     arq17 = "dados17.csv"
 
-    data17 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=";", low_memory=False) 
-    data17 = data17.dropna(subset=['CO_O_X']).head(100)
+    data17_2 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=";", low_memory=False) 
+    data17_2 = data17_2.dropna(subset=['CO_O_X']).head(100)
     geos = []
-    for index, row in data17.iterrows():
+    for index, row in data17_2.iterrows():
         lat = row['CO_O_X']
         lon = row['CO_O_Y']
         dest = utm.to_latlon(lat,lon, 23, 'K')
         geos.append((dest[1],dest[0]))
-    data17['coords'] = geos
-    return data17
+    data17_2['coords'] = geos
+    return data17_2
 
 def load_graph(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
     df = load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde)
@@ -127,17 +129,15 @@ def load_graph(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
             viagens.append(row['FE_VIA'])
     frame = pd.DataFrame(list(zip(lines, viagens)), columns =['geometry', 'FE_VIA'])
     grafo = gpd.GeoDataFrame(frame)
-    print(grafo)
     return grafo
 
 def load_curitiba():
-    curitiba = gpd.GeoDataFrame.from_file("/home/eduardo/DIVISA_DE_REGIONAIS/DIVISA_DE_REGIONAIS.shp", encoding='latin-1')
+    curitiba = gpd.GeoDataFrame.from_file("../data/shapes/DIVISA_DE_REGIONAIS.shp", encoding='latin-1')
     curitiba.crs = {'init' :'epsg:22522'}
     curitiba = curitiba.to_crs({"init": "epsg:4326"})
     print(curitiba)
     return curitiba
-load_curitiba()
 
 
-mapa = gpd.GeoDataFrame.from_file("/home/eduardo/Zonas_2017_region.shp", encoding='latin-1')
-print(mapa)
+#mapa = gpd.GeoDataFrame.from_file("../data/shapes/Zonas_2017_region.shp", encoding='latin-1')
+#print(mapa)
