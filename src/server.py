@@ -42,7 +42,15 @@ class Pontos(Resource):
 
 class Graph(Resource):
     def get(self):
-        return load_graph(0).to_json()
+        args = request.args
+        vehicle_type = args['vehicleType']
+        sexo = args['sexo']
+        horarioInicio = args['horarioInicio']
+        horarioFim = args['horarioFim']
+        origin = args['origin']
+        orde = args['orde']
+        mapa = load_graph(vehicle_type, sexo, horarioInicio, horarioFim, origin, orde)
+        return mapa.to_json()
 
 api.add_resource(Metro, '/metro')
 api.add_resource(Distritos, '/distritos') 
