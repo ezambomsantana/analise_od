@@ -381,6 +381,17 @@
                     '#FFEDA0';
     }
 
+    function getWidth(d) {
+      return d > 1500 ? 8 :
+        d > 1200 ? 7 :
+          d > 900 ? 6 :
+            d > 600 ? 5 :
+              d > 300 ? 4 :
+                d > 20 ? 3 :
+                  d > 10 ? 2 :
+                    2;
+    }
+
     function style(feature) {
 
       if (!renda && !distancia && !tempo && !quantidade) {
@@ -445,6 +456,16 @@
         opacity: 1,
         color: 'red',
         fillOpacity: 1
+      };
+    }
+
+
+    function style_graph(feature) {
+      return {
+        opacity: 1,
+        color: 'red',
+        fillOpacity: 1,
+        weight: getWidth(feature.properties.FE_VIA)
       };
     }
 
@@ -605,8 +626,16 @@
         map.removeLayer(graphLayer);
         return;
       }
+
+      var elements = Array.from(document.getElementById('vehicles').selectedOptions).map(v => v.value);
+      var sexo = document.getElementById('sexo').value;
+      var horarioInicio = document.getElementById('horarioInicio').value;
+      var horarioFim = document.getElementById('horarioFim').value;
+      var origin = document.getElementById('origin').value;
+      var orde = document.getElementById('orde').value;
       graph = true;
-      var url = 'http://localhost:5002/grafo'
+      var url = 'http://localhost:5002/grafo?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
+        + '&origin=' + origin  + '&orde=' + orde
       fetch(url, {
         method: 'get',
         headers: {
@@ -626,7 +655,8 @@
 
     function show_graph() {
       graphLayer = L.geoJson(graph_data, {
-        style: style_subway
+        style: style_graph,
+        onEachFeature: onEachFeature
       }).addTo(map);
     };
 
