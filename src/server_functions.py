@@ -137,3 +137,7 @@ def load_curitiba():
     print(curitiba)
     return curitiba
 load_curitiba()
+
+
+mapa = gpd.GeoDataFrame.from_file("/home/eduardo/Zonas_2017_region.shp", encoding='latin-1')
+print(mapa)
