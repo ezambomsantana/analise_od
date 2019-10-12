@@ -87,7 +87,7 @@
             <input type="checkbox" value="metro" onclick="initiate_subway()">Metrô</input></br>
             <input type="checkbox" value="metro" onclick="initiate_cptm()">CPTM</input></br>
             <input type="checkbox" value="metro" onclick="initiate_curitiba()">Curitiba</input></br>
-            <input type="checkbox" value="metro" onclick="initiate_distritos()">Distritos</input></br>
+            <input type="checkbox" value="metro" onclick="initiate_distritos(false)">Distritos</input><input type="checkbox" value="metro" onclick="initiate_distritos(true)">Zonas</input></br>
             &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_renda()">Renda</input></br>
             &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_distancia()">Distância</input></br>
             &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_tempo()">Tempo</input></br>
@@ -323,6 +323,7 @@
     var pontos = false;
     var graph = false;
     var curitiba = false;
+    var zonas = false;
 
     var renda = false;
     var distancia = false;
@@ -331,6 +332,7 @@
 
     var subwayLayer;
     var distritosLayer;
+    var zonasLayer;
     var pontosLayer;
     var graphLayer;
     var cptmLayer;
@@ -505,7 +507,7 @@
       });
     }
 
-    function initiate_distritos() {
+    function initiate_distritos(zonas) {
       if (distritos) {
         distritos = false;
         map.removeLayer(distritosLayer);
@@ -518,8 +520,12 @@
       var origin = document.getElementById('origin').value;
       var orde = document.getElementById('orde').value;
       distritos = true;
-      var url = 'http://localhost:5002/distritos?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
-        + '&origin=' + origin  + '&orde=' + orde
+      url = 'http://localhost:5002/zonas?vehicleType='+ elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
+          + '&origin=' + origin  + '&orde=' + orde;
+      if (!zonas) {
+        var url = 'http://localhost:5002/distritos?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
+          + '&origin=' + origin  + '&orde=' + orde;
+      }
       fetch(url, {
         method: 'get',
         headers: {
