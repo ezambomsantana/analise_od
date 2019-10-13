@@ -645,8 +645,9 @@
       var origin = document.getElementById('origin').value;
       var orde = document.getElementById('orde').value;
       graph = true;
-      var url = 'http://localhost:5002/grafo?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
-        + '&origin=' + origin  + '&orde=' + orde
+      var url = 'http://localhost:5002/grafo_zonas?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
+          + '&origin=' + origin  + '&orde=' + orde
+       alert(zonas)
       fetch(url, {
         method: 'get',
         headers: {

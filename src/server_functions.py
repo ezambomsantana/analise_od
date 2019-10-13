@@ -147,6 +147,23 @@ def load_graph(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
     grafo = gpd.GeoDataFrame(frame)
     return grafo
 
+def load_graph_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
+    df = load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde)
+    origin_distrito = df[df['NomeZona'] == origin]
+    print(df['FE_VIA'])
+    lines = []
+    viagens = []
+    for index, row in df.iterrows():
+        if ~np.isnan(row['FE_VIA']):
+            origin = origin_distrito['geometry'].iloc[0].centroid
+            dest = row['geometry'].centroid
+            line = LineString([origin, dest])
+            lines.append(line)
+            viagens.append(row['FE_VIA'])
+    frame = pd.DataFrame(list(zip(lines, viagens)), columns =['geometry', 'FE_VIA'])
+    grafo = gpd.GeoDataFrame(frame)
+    return grafo
+
 def load_curitiba():
     curitiba = gpd.GeoDataFrame.from_file("../data/shapes/DIVISA_DE_REGIONAIS.shp", encoding='latin-1')
     curitiba.crs = {'init' :'epsg:22522'}
