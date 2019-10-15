@@ -193,7 +193,7 @@ def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
         data17_copy = data17_copy[data17_copy['H_SAIDA'] <= int(horarioFim)]
 
     if origin != "0":
-        data17_copy = data17_copy[data17_copy['NOME_O'] == origin]
+        data17_copy = data17_copy[data17_copy['ZONA_O'] == origin]
     
 
     data_mp2 = data17_copy[[orde,  'MP']].groupby([orde]).sum().sort_values(by=['MP']).reset_index()
