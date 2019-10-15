@@ -19,7 +19,7 @@ def calculate_weighted_mean(data):
     data['MP_DIST'] = data['FE_VIA'] * data['DISTANCE']
     return data
 
-folder_data = "/home/eduardo/dev/analise_od/data/"
+folder_data = "../data/"
 folder_images_maps = "/Users/eduardosantana/pesquisa/analise_od/images/maps/"
 arq17 = "dados17.csv"
 
@@ -47,7 +47,7 @@ def calculate_distance(row):
 data17_carros['DISTANCE'] = data17_carros.apply(lambda x: calculate_distance(x), axis=1)
 
 data_menor = data17_carros[data17_carros['DISTANCE'] <= 6000]
-data_menor = data_menor.head(4350)
+data_menor = data_menor.head(6750)
 def calculate_distance_openservice(row):  
     if row.name not in dict_routes.keys(): 
         try:
