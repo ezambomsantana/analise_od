@@ -47,7 +47,7 @@ def calculate_distance(row):
 data17_carros['DISTANCE'] = data17_carros.apply(lambda x: calculate_distance(x), axis=1)
 
 data_menor = data17_carros[data17_carros['DISTANCE'] <= 6000]
-data_menor = data_menor.head(6950)
+data_menor = data_menor.head(8550)
 def calculate_distance_openservice(row):  
     if row.name not in dict_routes.keys(): 
         try:

@@ -83,11 +83,12 @@
 
             Camadas:</br>
 
-            <input type="checkbox" value="metro" onclick="initiate_graph()">Grafo</input></br>
+            <input type="checkbox" value="metro" onclick="initiate_graph(true)">Grafo Zonas</input></br>
+            <input type="checkbox" value="metro" onclick="initiate_graph(false)">Grafo Distritos</input></br>
             <input type="checkbox" value="metro" onclick="initiate_subway()">Metrô</input></br>
             <input type="checkbox" value="metro" onclick="initiate_cptm()">CPTM</input></br>
             <input type="checkbox" value="metro" onclick="initiate_curitiba()">Curitiba</input></br>
-            <input type="checkbox" value="metro" onclick="initiate_distritos(false)">Distritos</input><input type="checkbox" value="metro" onclick="initiate_distritos(true)">Zonas</input></br>
+            <input type="checkbox" value="metro" onclick="initiate_distritos()">Distritos</input><input type="checkbox" value="metro" onclick="initiate_zonas()">Zonas</input></br>
             &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_renda()">Renda</input></br>
             &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_distancia()">Distância</input></br>
             &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_tempo()">Tempo</input></br>
@@ -337,6 +338,7 @@
     var graphLayer;
     var cptmLayer;
     var curitibaLayer;
+    var zonasLayer;
 
 
     var map = L.map('map').setView([-23.5, -46.5], 8);
@@ -508,12 +510,13 @@
       });
     }
 
-    function initiate_distritos(zonas) {
+    function initiate_distritos() {
       if (distritos) {
         distritos = false;
         map.removeLayer(distritosLayer);
         return;
       }
+
       var elements = Array.from(document.getElementById('vehicles').selectedOptions).map(v => v.value);
       var sexo = document.getElementById('sexo').value;
       var horarioInicio = document.getElementById('horarioInicio').value;
@@ -521,12 +524,8 @@
       var origin = document.getElementById('origin').value;
       var orde = document.getElementById('orde').value;
       distritos = true;
-      url = 'http://localhost:5002/zonas?vehicleType='+ elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
+      var url = 'http://localhost:5002/distritos?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
           + '&origin=' + origin  + '&orde=' + orde;
-      if (!zonas) {
-        var url = 'http://localhost:5002/distritos?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
-          + '&origin=' + origin  + '&orde=' + orde;
-      }
       fetch(url, {
         method: 'get',
         headers: {
@@ -538,6 +537,41 @@
           .then(function (result) {
             statesData = JSON.parse(result)
             show_distritos()
+            load_table()
+          })
+      }).catch(function (err) {
+        // Error
+      });
+    }
+
+
+    function initiate_zonas() {
+      if (zonas) {
+        zonas = false;
+        map.removeLayer(zonasLayer);
+        return;
+      }
+
+      var elements = Array.from(document.getElementById('vehicles').selectedOptions).map(v => v.value);
+      var sexo = document.getElementById('sexo').value;
+      var horarioInicio = document.getElementById('horarioInicio').value;
+      var horarioFim = document.getElementById('horarioFim').value;
+      var origin = document.getElementById('origin').value;
+      var orde = document.getElementById('orde').value;
+      zonas = true;
+      url = 'http://localhost:5002/zonas?vehicleType='+ elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
+          + '&origin=' + origin  + '&orde=' + orde;
+      fetch(url, {
+        method: 'get',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then(function (response) {
+        response.json()
+          .then(function (result) {
+            statesData = JSON.parse(result)
+            show_zonas()
             load_table()
           })
       }).catch(function (err) {
@@ -598,6 +632,16 @@
 
     };
 
+    function show_zonas() {
+
+      zonasLayer = L.geoJson(statesData, {
+        style: style,
+        onEachFeature: onEachFeature
+      }).addTo(map);
+
+    }
+
+
     function initiate_subway() {
       if (subway) {
         subway = false;
@@ -631,7 +675,7 @@
 
     };
 
-    function initiate_graph() {
+    function initiate_graph(zonasParam) {
       if (graph) {
         graph = false;
         map.removeLayer(graphLayer);
@@ -645,9 +689,14 @@
       var origin = document.getElementById('origin').value;
       var orde = document.getElementById('orde').value;
       graph = true;
-      var url = 'http://localhost:5002/grafo_zonas?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
+      var url
+      if (zonasParam) {
+        url = 'http://localhost:5002/grafo_zonas?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
           + '&origin=' + origin  + '&orde=' + orde
-       alert(zonas)
+      } else {
+        url = 'http://localhost:5002/grafo?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
+          + '&origin=' + origin  + '&orde=' + orde
+      }
       fetch(url, {
         method: 'get',
         headers: {
