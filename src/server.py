@@ -30,7 +30,8 @@ class Distritos(Resource):
         horarioFim = args['horarioFim']
         origin = args['origin']
         orde = args['orde']
-        mapa = load_districts(vehicle_type, sexo, horarioInicio, horarioFim, origin, orde)
+        motivo = args['motivo']
+        mapa = load_districts(vehicle_type, sexo, horarioInicio, horarioFim, origin, orde, motivo)
         return mapa.to_json()
 
 class Pontos(Resource):
@@ -47,7 +48,8 @@ class Graph(Resource):
         horarioFim = args['horarioFim']
         origin = args['origin']
         orde = args['orde']
-        mapa = load_graph(vehicle_type, sexo, horarioInicio, horarioFim, origin, orde)
+        motivo = args['motivo']
+        mapa = load_graph(vehicle_type, sexo, horarioInicio, horarioFim, origin, orde, motivo)
         return mapa.to_json()
 
 class GraphZonas(Resource):
@@ -59,7 +61,8 @@ class GraphZonas(Resource):
         horarioFim = args['horarioFim']
         origin = args['origin']
         orde = args['orde']
-        mapa = load_graph_zonas(vehicle_type, sexo, horarioInicio, horarioFim, origin, 'ZONA_D')
+        motivo = args['motivo']
+        mapa = load_graph_zonas(vehicle_type, sexo, horarioInicio, horarioFim, origin, 'ZONA_D', motivo)
         return mapa.to_json()
 
 class Curitiba(Resource):
@@ -75,7 +78,8 @@ class Zonas(Resource):
         horarioFim = args['horarioFim']
         origin = args['origin']
         orde = args['orde']
-        mapa = load_zonas(vehicle_type, sexo, horarioInicio, horarioFim, origin, 'ZONA_O')
+        motivo = args['motivo']
+        mapa = load_zonas(vehicle_type, sexo, horarioInicio, horarioFim, origin, 'ZONA_O', motivo)
         return mapa.to_json()      
 
 api.add_resource(Metro, '/metro')

@@ -57,7 +57,7 @@ data17['NUM_TRANS'] = data17[['MODO1', 'MODO2','MODO3','MODO4']].count(axis=1)
 
 data17 = calculate_weighted_mean(data17)
 
-def load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
+def load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
 
     data17_copy = data17
 
@@ -80,6 +80,12 @@ def load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
     if origin != "0":
         data17_copy = data17_copy[data17_copy['NOME_O'] == origin]
     
+    if motivo != "0":
+        motivo = motivo.split(",")
+        motivo_int = []
+        for v in motivo:
+            motivo_int.append(int(v))
+        data17_copy = data17_copy[data17_copy['MOTIVO_D'].isin(motivo_int)]
 
     data_mp2 = data17_copy[[orde,  'MP']].groupby([orde]).sum().sort_values(by=['MP']).reset_index()
     data_mp2 = data_mp2.set_index(orde)
@@ -130,8 +136,8 @@ def load_data17():
     data17_2['coords'] = geos
     return data17_2
 
-def load_graph(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
-    df = load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde)
+def load_graph(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
+    df = load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo)
     origin_distrito = df[df['NomeDistri'] == origin]
     print(df['FE_VIA'])
     lines = []
@@ -147,8 +153,8 @@ def load_graph(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
     grafo = gpd.GeoDataFrame(frame)
     return grafo
 
-def load_graph_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
-    df = load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde)
+def load_graph_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
+    df = load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo)
     origin_distrito = df[df['NomeZona'] == origin]
     print(df['FE_VIA'])
     lines = []
@@ -172,7 +178,7 @@ def load_curitiba():
     return curitiba
 
 
-def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde):
+def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
 
     data17_copy = data17
 

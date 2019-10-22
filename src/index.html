@@ -102,7 +102,7 @@
             <div class="form-group">
               <label for="exampleFormControlSelect2">Tipos de Veículos</label>
               <select multiple class="form-control" id="vehicles">
-                <option value="0" selected disabled hidden>Tipo de Veículo</option>
+                <option value="0" selected>Todos</option>
                 <option value="1">01 - Metrô</option>
                 <option value="2">02 - Trem</option>
                 <option value="3">03 - Monotrilho</option>
@@ -120,6 +120,24 @@
                 <option value="15">15 - Bicicleta</option>
                 <option value="16">16 - A Pé</option>
                 <option value="17">17 - Outros</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="exampleFormControlSelect2">Motivo da Viagem</label>
+              <select multiple class="form-control" id="motivo">
+                <option value="0" selected >Todos</option>
+                <option value="1">01 - Trabalho Indústria</option>
+                <option value="2">02 - Trabalho Comércio</option>
+                <option value="3">03 - Trabalho Serviços</option>
+                <option value="4">04 - Escola/Educação</option>
+                <option value="5">05 - Compras</option>
+                <option value="6">06 - Médico/Dentista/Saúde</option>
+                <option value="7">07 - Recreação/Visitas/Lazer</option>
+                <option value="8">08 - Residência</option>
+                <option value="9">09 - Procurar Emprego</option>
+                <option value="10">10 - Assuntos Pessoais</option>
+                <option value="11">11 - Refeição</option>
               </select>
             </div>
 
@@ -523,9 +541,10 @@
       var horarioFim = document.getElementById('horarioFim').value;
       var origin = document.getElementById('origin').value;
       var orde = document.getElementById('orde').value;
+      var motivo = document.getElementById('motivo').value;
       distritos = true;
       var url = 'http://localhost:5002/distritos?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
-          + '&origin=' + origin  + '&orde=' + orde;
+          + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo;
       fetch(url, {
         method: 'get',
         headers: {
@@ -558,9 +577,10 @@
       var horarioFim = document.getElementById('horarioFim').value;
       var origin = document.getElementById('origin').value;
       var orde = document.getElementById('orde').value;
+      var motivo = document.getElementById('motivo').value;
       zonas = true;
       url = 'http://localhost:5002/zonas?vehicleType='+ elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
-          + '&origin=' + origin  + '&orde=' + orde;
+          + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo;
       fetch(url, {
         method: 'get',
         headers: {
@@ -688,14 +708,15 @@
       var horarioFim = document.getElementById('horarioFim').value;
       var origin = document.getElementById('origin').value;
       var orde = document.getElementById('orde').value;
+      var motivo = document.getElementById('motivo').value;
       graph = true;
       var url
       if (zonasParam) {
         url = 'http://localhost:5002/grafo_zonas?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
-          + '&origin=' + origin  + '&orde=' + orde
+          + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo
       } else {
         url = 'http://localhost:5002/grafo?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
-          + '&origin=' + origin  + '&orde=' + orde
+          + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo
       }
       fetch(url, {
         method: 'get',
