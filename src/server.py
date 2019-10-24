@@ -91,6 +91,5 @@ api.add_resource(GraphZonas, '/grafo_zonas')
 api.add_resource(Curitiba, '/curitiba')
 api.add_resource(Zonas, '/zonas')
 
-
 if __name__ == '__main__':
      app.run(port='5002')

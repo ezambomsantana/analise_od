@@ -1,12 +1,9 @@
 import geopandas as gpd
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 import csv
 import unidecode
 import math
-import seaborn as sns
-import geopy.distance
 import utm
 from shapely.geometry import shape, LineString, Polygon
 
@@ -46,9 +43,6 @@ with open(csv_file, mode='r') as infile:
 
 data17['NOME_O'] = data17['ZONA_O'].apply(lambda x: '' if pd.isnull(x) else mydict[x])
 data17['NOME_D'] = data17['ZONA_D'].apply(lambda x: '' if pd.isnull(x) else mydict[x])
-
-print(data17['ZONA_O'])
-print(data17[data17['ZONA_O'] == '381'])
 
 data17['ZONA_O'] = data17['ZONA_O'].apply(lambda x: '' if pd.isnull(x) else zonas_nomes[x])
 data17['ZONA_D'] = data17['ZONA_D'].apply(lambda x: '' if pd.isnull(x) else zonas_nomes[x])
@@ -176,7 +170,6 @@ def load_curitiba():
     curitiba = curitiba.to_crs({"init": "epsg:4326"})
     print(curitiba)
     return curitiba
-
 
 def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
 
