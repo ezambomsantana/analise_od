@@ -65,6 +65,8 @@ for index, row in data17.iterrows():
                     elevacao =  diff
                     dist = dist_link
                     dir = 'd'
+            else:
+                dist = dist + dist_link
         last = item[2]
         last_pos = (item[0], item[1])
 
