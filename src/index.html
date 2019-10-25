@@ -80,22 +80,30 @@
 
           <div id='filters' style="float:left">
 
+            <div class="form-group">
+              <label for="exampleFormControlSelect2">Viagens:</label>
+              <input type="checkbox" value="metro" onclick="initiate_graph(true)">Zonas</input>
+              <input type="checkbox" value="metro" onclick="initiate_graph(false)">Distritos</input>
+            </div>
+            <!-- input type="checkbox" value="metro" onclick="initiate_curitiba()">Curitiba</input></br -->
 
-            Camadas:</br>
+            <div class="form-group">
+              <label for="exampleFormControlSelect2">Áreas:</label>
+              <input type="checkbox" value="metro" onclick="initiate_zonas()">Zonas</input>
+              <input type="checkbox" value="metro" onclick="initiate_distritos()">Distritos</input>
+              </br>
+              Indicador: <input type="checkbox" value="metro" onclick="change_renda()">Renda</input>
+              &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_distancia()">Distância</input>
+              &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_tempo()">Tempo</input>
+              &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_quantidade()">Viagens</input></br>
+            </div>
 
-            <input type="checkbox" value="metro" onclick="initiate_graph(true)">Grafo Zonas</input></br>
-            <input type="checkbox" value="metro" onclick="initiate_graph(false)">Grafo Distritos</input></br>
-            <input type="checkbox" value="metro" onclick="initiate_subway()">Metrô</input></br>
-            <input type="checkbox" value="metro" onclick="initiate_cptm()">CPTM</input></br>
-            <input type="checkbox" value="metro" onclick="initiate_curitiba()">Curitiba</input></br>
-            <input type="checkbox" value="metro" onclick="initiate_distritos()">Distritos</input><input type="checkbox" value="metro" onclick="initiate_zonas()">Zonas</input></br>
-            &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_renda()">Renda</input></br>
-            &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_distancia()">Distância</input></br>
-            &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_tempo()">Tempo</input></br>
-            &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_quantidade()">Quantidade de
-            Viagens</input></br>
-
-            <input type="checkbox" value="metro" onclick="initiate_pontos()">Pontos</input></br>
+            <div class="form-group">
+              <label for="exampleFormControlSelect2">Transporte:</label>
+              <input type="checkbox" value="metro" onclick="initiate_subway()">Metrô</input>
+              <input type="checkbox" value="metro" onclick="initiate_cptm()">CPTM</input>
+            </div>
+            <!-- input type="checkbox" value="metro" onclick="initiate_pontos()">Pontos</input></br -->
 
             Filtros:
 
@@ -158,7 +166,7 @@
               <input class="form-control" type="text" value="0" id="horarioFim">
             </div>      
             <div class="form-group">
-              <label for="exampleFormControlSelect2">Distrito Origem</label>
+              <label for="exampleFormControlSelect2">Distrit/Zona Origem</label>
               <input class="form-control" type="text" value="0" id="origin">
             </div>   
             <div class="form-group">
