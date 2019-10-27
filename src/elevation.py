@@ -47,7 +47,7 @@ def calculate_distance(row):
 data17_carros['DISTANCE'] = data17_carros.apply(lambda x: calculate_distance(x), axis=1)
 
 data_menor = data17_carros[data17_carros['DISTANCE'] <= 6000]
-data_menor = data_menor.head(13550)
+data_menor = data_menor.head(15750)
 def calculate_distance_openservice(row):  
     if row.name not in dict_routes.keys(): 
         try:
@@ -57,7 +57,7 @@ def calculate_distance_openservice(row):
 
             coords = ((origin[1],origin[0]), (dest[1], dest[0]))
             print(coords)
-            client = openrouteservice.Client(key='5b3ce3597851110001cf62489b0051e2356b4c01836db805ff886922') # Specify your personal API key
+            client = openrouteservice.Client(key='5b3ce3597851110001cf62485349cbc08b96426bbe758858180a1503') # Specify your personal API key
             routes = client.directions(coords)
             geometry = routes['routes'][0]['geometry']
             elevs = client.elevation_line('encodedpolyline', geometry)
