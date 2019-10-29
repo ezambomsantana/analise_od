@@ -221,3 +221,22 @@ def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
     df['MEDIA_DIST'] = df['MP_DIST'] / df['FE_VIA']
     df = df.reset_index()
     return df
+
+def bike_flows():
+    flows = pd.read_csv("flows.csv", encoding='latin-1')
+    lines = []
+    viagens = []
+
+    flows['count'] = 1
+    flows = flows[['i','j', 'origin_x', 'origin_y','dest_x','dest_y', 'count']].groupby(['i','j', 'origin_x', 'origin_y','dest_x','dest_y']).sum().sort_values(by=['count']).reset_index()
+
+    for index, row in flows.iterrows():
+        line = LineString([(row['origin_x'],row['origin_y']), (row['dest_x'],row['dest_y'])])
+        lines.append(line)
+        viagens.append(row['count'])
+
+
+    frame = pd.DataFrame(list(zip(viagens,lines)), columns =['count','geometry'])
+    grafo = gpd.GeoDataFrame(frame)
+    print(grafo)
+    return grafo

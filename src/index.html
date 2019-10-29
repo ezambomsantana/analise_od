@@ -13,6 +13,7 @@
   <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
     integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
     crossorigin=""></script>
+  <script src="decorator.js"></script>
   <title>Template de dashboard, usando Bootstrap.</title>
 
   <!-- Principal CSS do Bootstrap -->
@@ -486,6 +487,16 @@
 
     }
 
+    function styleGrid(feature) {
+
+        return {
+          weight: 2,
+          opacity: 1,
+          color: 'black',
+          dashArray: '3',
+        };
+    }
+
     function style_subway(feature) {
       return {
         opacity: 1,
@@ -502,6 +513,26 @@
         fillOpacity: 1,
         weight: getWidth(feature.properties.FE_VIA)
       };
+    }
+
+    function style_flows(feature) {
+      return {
+        opacity: 1,
+        color: 'red',
+        fillOpacity: 1,
+        weight: getWidthFlow(feature.properties.count)
+      };
+    }
+
+    function getWidthFlow(d) {
+      return d > 40 ? 50 :
+        d > 30 ? 6 :
+          d > 20 ? 4 :
+            d > 10 ? 2 :
+              d > 5 ? 1 :
+                d > 5 ? 1 :
+                  d > 2 ? 100 :
+                    1;
     }
 
     function style_cptm(feature) {
@@ -872,6 +903,81 @@
 
 
     };
+
+
+    function initiate_flows() {
+      curitiba = true;
+      var url = 'http://localhost:5002/fluxos'
+      fetch(url, {
+        method: 'get',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then(function (response) {
+        response.json()
+          .then(function (result) {
+            fluxo_data = JSON.parse(result)
+            console.log(fluxo_data)
+            show_fluxos()
+          })
+      }).catch(function (err) {
+        // Error
+      });
+    }
+
+    function show_fluxos() {
+
+      var lines = fluxo_data.features
+      .filter(function(feature) { return feature.geometry.type == "LineString" })
+      .map(function(feature) {
+          var coordinates = feature.geometry.coordinates;
+          var count = feature.properties.count;
+          coordinates.forEach(function(coordinate) { coordinate.reverse(); })
+          return L.polyline(coordinates, {weight: count / 3});
+      })
+
+      lines.forEach(item => item.addTo(map));
+      
+      var arrowHead = L.polylineDecorator(lines, {
+        patterns: [
+            {offset: '100%', repeat: 0, symbol: L.Symbol.arrowHead({pixelSize: 5, polygon: false, pathOptions: {stroke: true}})}
+        ]
+    }).addTo(map);
+
+    };
+
+
+    function initiate_gridas() {
+      curitiba = true;
+      var url = 'http://localhost:5002/grids'
+      fetch(url, {
+        method: 'get',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then(function (response) {
+        response.json()
+          .then(function (result) {
+            fluxo_data = JSON.parse(result)
+            console.log(fluxo_data)
+            show_grids()
+          })
+      }).catch(function (err) {
+        // Error
+      });
+    }
+
+    function show_grids() {
+
+      fluxoLayer = L.geoJson(fluxo_data, {
+        style: styleGrid
+      }).addTo(map);
+
+    };
+    initiate_flows();
+    initiate_gridas();
 
   </script>
 

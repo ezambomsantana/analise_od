@@ -5,22 +5,23 @@ import pandas as pd
 import csv
 import unidecode
 import math
-import seaborn as sns
 import geopy.distance
 import utm
-from shapely.geometry import shape, LineString, Polygon
+from shapely.geometry import shape, LineString, Polygon, Point
 from ast import literal_eval
+from sp_grid import create
 
 def calculate_distance(origin, dest):  
     return geopy.distance.geodesic(origin, dest).meters
 
-
 folder_data = "../data/"
 folder_images_maps = "/Users/eduardosantana/pesquisa/analise_od/images/maps/"
-arq17 = "ind.csv"
+arq17 = "indices.csv"
 
 data17 = pd.read_csv(arq17, header=0,delimiter=",", low_memory=False) 
 data17.columns = ['id','path']
+
+data17 = data17.dropna()
 
 count_2 = 0
 count_4 = 0
@@ -29,6 +30,8 @@ count_6 = 0
 points = []
 for index, row in data17.iterrows():
     tup = row['path']
+    if tup == '':
+        continue
     l = literal_eval(tup)
     elevacao = 0
     dist = 0
@@ -74,10 +77,17 @@ for index, row in data17.iterrows():
     if bigger_dist > 0:
         if (bigger/bigger_dist)*100 <= 2:
             count_2 = count_2 + 1
-            points.append(l[0][0])
+            origin = l[0][0]
+            dest = l[0][-1]
+            line = LineString([(origin[0], origin[1]), (dest[0], dest[1])])
+            points.append(line)
+            
         elif (bigger/bigger_dist)*100 <= 4:
-            count_4 = count_4 + 1
-            points.append(l[0][0])
+            count_4 = count_4 + 1       
+            origin = l[0][0]
+            dest = l[0][-1]
+            line = LineString([(origin[0], origin[1]), (dest[0], dest[1])])
+            points.append(line)
         elif (bigger/bigger_dist)*100 <= 6:
             count_6 = count_6 + 1
         if (bigger/bigger_dist)*100 > 100:
@@ -86,18 +96,61 @@ print(count_2)
 print(count_4)
 print(count_6)
 
-import pandas as pd
-import folium
+def show_lines():
+    global points
+    frame = pd.DataFrame(points, columns =['geometry'])
+    grafo = gpd.GeoDataFrame(frame)
+    return grafo
 
-def generateBaseMap(default_location=[-23.533773, -46.625290], default_zoom_start=12):
-    base_map = folium.Map(location=default_location, control_scale=True, zoom_start=default_zoom_start)
-    return base_map
+def calculate_grids():
+    global points
 
-from folium.plugins import HeatMap
+    grids = create().geodataframe()
+    origins_x = []
+    origins_y = []
+    dests_x = []
+    dests_y = []
+    i = []
+    j = []
+    print(len(points))
+    count = 0
+    for item in points:
+        achou_origin = False
+        achou_dest = False      
+        origin_index = 0
+        origin_dest = 0  
+        for index, row in grids.iterrows():   
+            polygon = row['geometry'] 
+            if polygon.contains(Point(item.coords[0])):
+                origin_index = index 
+                i.append(row['i'])    
+                achou_origin = True     
+            if polygon.contains(Point(item.coords[1])):
+                origin_dest = index                
+                j.append(row['j'])    
+                achou_dest = True   
 
-df_copy = pd.DataFrame(points, columns =['lat', 'long', 'alt']) 
+        if achou_origin and achou_dest:
+            count = count + 1
+            print(count)
+            rowOrigin = grids.iloc[[origin_index]]
+            rowdest = grids.iloc[[origin_dest]]
 
-df_copy['count'] = 1
-base_map = generateBaseMap()
-m = HeatMap(data=df_copy[['long', 'lat', 'count']].groupby(['long', 'lat']).sum().reset_index().values.tolist(), radius=8, max_zoom=13).add_to(base_map)
-m.save("filename.html")
+            origin = rowOrigin['geometry'].centroid
+            dest = rowdest['geometry'].centroid
+
+            origin = origin.iloc[0]
+            dest = dest.iloc[0]
+
+            line = LineString([origin, dest])
+            origins_x.append(origin.x)
+            origins_y.append(origin.y)
+            dests_x.append(dest.x)
+            dests_y.append(dest.y)
+            continue
+
+    frame = pd.DataFrame(list(zip(i,j,origins_x, origins_y, dests_x, dests_y)), columns =['i','j','origin_x', 'origin_y', 'dest_x', 'dest_y'])
+    frame.to_csv('flows.csv')
+    return frame
+
+calculate_grids()
