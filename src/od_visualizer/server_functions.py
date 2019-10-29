@@ -14,16 +14,16 @@ def calculate_weighted_mean(data):
     data['MP_DIST'] = data['FE_VIA'] * data['DISTANCE']
     return data
 
-mapa = gpd.GeoDataFrame.from_file("../data/shapes/Distritos_2017_region.shp", encoding='latin-1')
+mapa = gpd.GeoDataFrame.from_file("../../data/shapes/Distritos_2017_region.shp", encoding='latin-1')
 mapa = mapa.to_crs({"init": "epsg:4326"})
 mapa['NomeDistri'] = mapa['NomeDistri'].apply(lambda x: unidecode.unidecode(x))
 
-zonas = gpd.GeoDataFrame.from_file("../data/shapes/Zonas_2017_region.shp", encoding='latin-1')
+zonas = gpd.GeoDataFrame.from_file("../../data/shapes/Zonas_2017_region.shp", encoding='latin-1')
 zonas = zonas.to_crs({"init": "epsg:4326"}) 
 zonas['NomeDistri'] = zonas['NomeDistri'].apply(lambda x: unidecode.unidecode(x))
 zonas['NomeZona'] = zonas['NomeZona'].apply(lambda x: unidecode.unidecode(x))
 
-folder_data = "../data/"
+folder_data = "../../data/"
 arq17 = "dados17_distance.csv"
 
 data17 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=",", low_memory=False) 
@@ -103,20 +103,20 @@ def load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motiv
     return df
 
 def load_subway():
-    metro = gpd.GeoDataFrame.from_file("../data/shapes//SIRGAS_SHP_linhametro_line.shp", encoding='latin-1')
+    metro = gpd.GeoDataFrame.from_file("../../data/shapes//SIRGAS_SHP_linhametro_line.shp", encoding='latin-1')
     metro.crs = {'init' :'epsg:22523'}
     metro = metro.to_crs({"init": "epsg:4326"})
     return metro
 
 def load_cptm():
-    cptm = gpd.GeoDataFrame.from_file("../data/shapes//SIRGAS_SHP_linhatrem_line.shp", encoding='latin-1')
+    cptm = gpd.GeoDataFrame.from_file("../../data/shapes//SIRGAS_SHP_linhatrem_line.shp", encoding='latin-1')
     cptm.crs = {'init' :'epsg:22523'}
     cptm = cptm.to_crs({"init": "epsg:4326"})
     return cptm
 
 
 def load_data17():
-    folder_data = "../data/"
+    folder_data = "../../data/"
     arq17 = "dados17.csv"
 
     data17_2 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=";", low_memory=False) 
@@ -165,7 +165,7 @@ def load_graph_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, mot
     return grafo
 
 def load_curitiba():
-    curitiba = gpd.GeoDataFrame.from_file("../data/shapes/DIVISA_DE_REGIONAIS.shp", encoding='latin-1')
+    curitiba = gpd.GeoDataFrame.from_file("../../data/shapes/DIVISA_DE_REGIONAIS.shp", encoding='latin-1')
     curitiba.crs = {'init' :'epsg:22522'}
     curitiba = curitiba.to_crs({"init": "epsg:4326"})
     print(curitiba)
@@ -223,7 +223,7 @@ def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
     return df
 
 def bike_flows():
-    flows = pd.read_csv("flows.csv", encoding='latin-1')
+    flows = pd.read_csv("../flows.csv", encoding='latin-1')
     lines = []
     viagens = []
 

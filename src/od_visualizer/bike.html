@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="icon" href="../../../../favicon.ico">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+    integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+    crossorigin=""></script>
+  <script src="decorator.js"></script>
+  <title>Template de dashboard, usando Bootstrap.</title>
+
+  <!-- Principal CSS do Bootstrap -->
+  <link href="../dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Estilos customizados para esse template -->
+  <link href="dashboard.css" rel="stylesheet">
+</head>
+
+<body>
+  <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Nome da companhia</a>
+    <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+    <ul class="navbar-nav px-3">
+      <li class="nav-item text-nowrap">
+        <a class="nav-link" href="#">Sair</a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+        <div class="sidebar-sticky">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link active" href="#">
+                <span data-feather="home"></span>
+                OD 2017 <span class="sr-only">(atual)</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">
+                <span ></span>
+                OD 2007
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">
+                <span ></span>
+                OD 1997
+              </a>
+            </li>
+          </ul>
+      </nav>
+
+      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+        <div
+          class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+          <h1 class="h2">Dashboard</h1>
+          <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+              <button class="btn btn-sm btn-outline-secondary">Compartilhar</button>
+              <button class="btn btn-sm btn-outline-secondary">Exportar</button>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
+              <span data-feather="calendar"></span>
+              Esta semana
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div id='map' style="float:left"></div>
+
+          <div id='filters' style="float:left">
+
+
+          </div>
+        </div>
+
+
+
+
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Principal JavaScript do Bootstrap
+    ================================================== -->
+  <!-- Foi colocado no final para a página carregar mais rápido -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+  <script src="../../assets/js/vendor/popper.min.js"></script>
+  <script src="../../dist/js/bootstrap.min.js"></script>
+
+  <!-- Ícones -->
+  <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+  <script>
+    feather.replace()
+  </script>
+
+
+  <script type="text/javascript">
+
+
+
+    var map = L.map('map').setView([-23.5, -46.5], 8);
+
+
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+      maxZoom: 18,
+      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      id: 'mapbox.light'
+    }).addTo(map);
+
+    
+    function style_flows(feature) {
+      return {
+        opacity: 1,
+        color: 'red',
+        fillOpacity: 1,
+        weight: getWidthFlow(feature.properties.count)
+      };
+    }
+
+    function getWidthFlow(d) {
+      return d > 40 ? 50 :
+        d > 30 ? 6 :
+          d > 20 ? 4 :
+            d > 10 ? 2 :
+              d > 5 ? 1 :
+                d > 5 ? 1 :
+                  d > 2 ? 100 :
+                    1;
+    }
+
+    function highlightFeature(e) {
+      var layer = e.target;
+
+      info.update(layer.feature.properties);
+    }
+
+    var geojson;
+
+    function resetHighlight(e) {
+      info.update();
+    }
+
+    function zoomToFeature(e) {
+      map.fitBounds(e.target.getBounds());
+    }
+
+    function onEachFeature(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+        click: zoomToFeature
+      });
+    }
+    function initiate_flows() {
+      curitiba = true;
+      var url = 'http://localhost:5002/fluxos'
+      fetch(url, {
+        method: 'get',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then(function (response) {
+        response.json()
+          .then(function (result) {
+            fluxo_data = JSON.parse(result)
+            console.log(fluxo_data)
+            show_fluxos()
+          })
+      }).catch(function (err) {
+        // Error
+      });
+    }
+
+    function show_fluxos() {
+
+      var lines = fluxo_data.features
+      .filter(function(feature) { return feature.geometry.type == "LineString" })
+      .map(function(feature) {
+          var coordinates = feature.geometry.coordinates;
+          var count = feature.properties.count;
+          coordinates.forEach(function(coordinate) { coordinate.reverse(); })
+          return L.polyline(coordinates, {weight: count / 3});
+      })
+
+      lines.forEach(item => item.addTo(map));
+      
+      var arrowHead = L.polylineDecorator(lines, {
+        patterns: [
+            {offset: '100%', repeat: 0, symbol: L.Symbol.arrowHead({pixelSize: 5, polygon: false, pathOptions: {stroke: true}})}
+        ]
+    }).addTo(map);
+
+    };
+
+
+    function initiate_gridas() {
+      curitiba = true;
+      var url = 'http://localhost:5002/grids'
+      fetch(url, {
+        method: 'get',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then(function (response) {
+        response.json()
+          .then(function (result) {
+            fluxo_data = JSON.parse(result)
+            console.log(fluxo_data)
+            show_grids()
+          })
+      }).catch(function (err) {
+        // Error
+      });
+    }
+
+    function show_grids() {
+
+      fluxoLayer = L.geoJson(fluxo_data, {
+        style: styleGrid
+      }).addTo(map);
+
+    };
+    initiate_flows();
+    initiate_gridas();
+
+  </script>
+
+
+</body>
+
+</html>
