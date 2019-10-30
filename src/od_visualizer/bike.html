@@ -132,6 +132,8 @@
   <script type="text/javascript">
 
 
+    var server = 'localhost:5002'
+
     var ate2 = false;
     var ate4 = false; 
     var linesMap = null;
@@ -213,7 +215,7 @@
       tempo = document.getElementById('tempo').value;
       flow = document.getElementById('flow').value;
 
-      var url = 'http://localhost:5002/fluxos?elevacao=' + elevacao + '&distancia=' + distancia + '&tempo=' + tempo + '&flow=' + flow
+      var url = 'http://' + server + '/fluxos?elevacao=' + elevacao + '&distancia=' + distancia + '&tempo=' + tempo + '&flow=' + flow
       fetch(url, {
         method: 'get',
         headers: {
@@ -257,7 +259,7 @@
 
     function initiate_gridas() {
       curitiba = true;
-      var url = 'http://localhost:5002/grids'
+      var url = 'http://' + server + '/grids'
       fetch(url, {
         method: 'get',
         headers: {
