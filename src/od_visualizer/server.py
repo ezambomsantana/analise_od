@@ -89,7 +89,8 @@ class Fluxos(Resource):
         elevacao = args['elevacao']
         distancia = args['distancia']
         tempo = args['tempo']
-        fluxos = bike_flows(elevacao, distancia, tempo)
+        flow = args['flow']
+        fluxos = bike_flows(elevacao, distancia, tempo, flow)
         return fluxos.to_json()      
 
 

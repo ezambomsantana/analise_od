@@ -222,11 +222,14 @@ def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
     df = df.reset_index()
     return df
 
-def bike_flows(elevacao, distancia, tempo):
+def bike_flows(elevacao, distancia, tempo, flow):
     flows = pd.read_csv("../flows.csv", encoding='latin-1')
     lines = []
     viagens = []
 
+    flows = flows.set_index('index')
+    flows = flows.join(data17, lsuffix='_left', rsuffix='_right')
+    
     if elevacao != "0":
         flows = flows[flows['elevation'] == int(elevacao)]
 
@@ -236,16 +239,18 @@ def bike_flows(elevacao, distancia, tempo):
     if tempo != "0":
         flows = flows[flows['time'] <= int(tempo)]
 
-    flows['count'] = 1
-    flows = flows[['i','j', 'origin_x', 'origin_y','dest_x','dest_y', 'count']].groupby(['i','j', 'origin_x', 'origin_y','dest_x','dest_y']).sum().sort_values(by=['count']).reset_index()
+    flows = flows[['i','j', 'origin_x', 'origin_y','dest_x','dest_y', 'FE_VIA']].groupby(['i','j', 'origin_x', 'origin_y','dest_x','dest_y']).sum().sort_values(by=['FE_VIA']).reset_index()
 
     for index, row in flows.iterrows():
         line = LineString([(row['origin_x'],row['origin_y']), (row['dest_x'],row['dest_y'])])
         lines.append(line)
-        viagens.append(row['count'])
-
+        viagens.append(row['FE_VIA'])
 
     frame = pd.DataFrame(list(zip(viagens,lines)), columns =['count','geometry'])
+    if flow != "0":
+        frame = frame[frame['count'] >= int(flow)]
+
     grafo = gpd.GeoDataFrame(frame)
-    print(grafo)
     return grafo
+
+bike_flows("0","0","0","5000")

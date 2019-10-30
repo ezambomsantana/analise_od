@@ -95,6 +95,10 @@
             <div class="form-group">
               <label for="exampleFormControlSelect2">Tempo</label>
               <input class="form-control" type="text" value="0" id="tempo">
+            </div>   
+            <div class="form-group">
+              <label for="exampleFormControlSelect2">Fluxo Minímo</label>
+              <input class="form-control" type="text" value="0" id="flow">
             </div> 
             <button onclick="initiate_flows()">Recarregar</button>  
           </div>
@@ -207,8 +211,9 @@
       elevacao = document.getElementById('elevacao').value;
       distancia = document.getElementById('distancia').value;
       tempo = document.getElementById('tempo').value;
+      flow = document.getElementById('flow').value;
 
-      var url = 'http://localhost:5002/fluxos?elevacao=' + elevacao + '&distancia=' + distancia + '&tempo=' + tempo
+      var url = 'http://localhost:5002/fluxos?elevacao=' + elevacao + '&distancia=' + distancia + '&tempo=' + tempo + '&flow=' + flow
       fetch(url, {
         method: 'get',
         headers: {
@@ -235,7 +240,7 @@
           var coordinates = feature.geometry.coordinates;
           var count = feature.properties.count;
           coordinates.forEach(function(coordinate) { coordinate.reverse(); })
-          return L.polyline(coordinates, {weight: count / 3});
+          return L.polyline(coordinates, {weight: count / 1000});
       })
 
       lines.forEach(item => item.addTo(map));
@@ -243,7 +248,7 @@
       
       arrowHead = L.polylineDecorator(lines, {
         patterns: [
-            {offset: '100%', repeat: 0, symbol: L.Symbol.arrowHead({pixelSize: 5, polygon: false, pathOptions: {stroke: true}})}
+            {offset: '100%', repeat: 0, symbol: L.Symbol.arrowHead({pixelSize: 10, polygon: false, pathOptions: {stroke: true}})}
         ]
     }).addTo(map);
 
