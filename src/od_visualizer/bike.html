@@ -80,8 +80,23 @@
           <div id='map' style="float:left"></div>
 
           <div id='filters' style="float:left">
-
-
+            <div class="form-group">
+              <label for="exampleFormControlSelect2">Elevação</label>
+              <select  class="form-control" id="elevacao">
+                <option value="0" selected >Todas</option>
+                <option value="2">Até 2%</option>
+                <option value="4">Entre 2% e 4%</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="exampleFormControlSelect2">Distância</label>
+              <input class="form-control" type="text" value="0" id="distancia">
+            </div>      
+            <div class="form-group">
+              <label for="exampleFormControlSelect2">Tempo</label>
+              <input class="form-control" type="text" value="0" id="tempo">
+            </div> 
+            <button onclick="initiate_flows()">Recarregar</button>  
           </div>
         </div>
 
@@ -113,8 +128,13 @@
   <script type="text/javascript">
 
 
-
+    var ate2 = false;
+    var ate4 = false; 
+    var linesMap = null;
+    var arrowHead = null;
     var map = L.map('map').setView([-23.5, -46.5], 8);
+
+    L.control.scale().addTo(map);
 
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -125,6 +145,15 @@
       id: 'mapbox.light'
     }).addTo(map);
 
+    function styleGrid(feature) {
+
+      return {
+        weight: 1,
+        opacity: 0.5,
+        fillOpacity:0.0,
+        color: 'gray'
+      };
+    }
     
     function style_flows(feature) {
       return {
@@ -170,8 +199,16 @@
       });
     }
     function initiate_flows() {
-      curitiba = true;
-      var url = 'http://localhost:5002/fluxos'
+      if (linesMap != null) {
+        linesMap.forEach(item => map.removeLayer(item));
+        map.removeLayer(arrowHead);  
+      }
+
+      elevacao = document.getElementById('elevacao').value;
+      distancia = document.getElementById('distancia').value;
+      tempo = document.getElementById('tempo').value;
+
+      var url = 'http://localhost:5002/fluxos?elevacao=' + elevacao + '&distancia=' + distancia + '&tempo=' + tempo
       fetch(url, {
         method: 'get',
         headers: {
@@ -202,8 +239,9 @@
       })
 
       lines.forEach(item => item.addTo(map));
+      linesMap = lines
       
-      var arrowHead = L.polylineDecorator(lines, {
+      arrowHead = L.polylineDecorator(lines, {
         patterns: [
             {offset: '100%', repeat: 0, symbol: L.Symbol.arrowHead({pixelSize: 5, polygon: false, pathOptions: {stroke: true}})}
         ]
@@ -225,7 +263,6 @@
         response.json()
           .then(function (result) {
             fluxo_data = JSON.parse(result)
-            console.log(fluxo_data)
             show_grids()
           })
       }).catch(function (err) {

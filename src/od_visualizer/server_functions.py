@@ -222,10 +222,19 @@ def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
     df = df.reset_index()
     return df
 
-def bike_flows():
+def bike_flows(elevacao, distancia, tempo):
     flows = pd.read_csv("../flows.csv", encoding='latin-1')
     lines = []
     viagens = []
+
+    if elevacao != "0":
+        flows = flows[flows['elevation'] == int(elevacao)]
+
+    if distancia != "0":
+        flows = flows[flows['distance'] <= int(distancia)]
+
+    if tempo != "0":
+        flows = flows[flows['time'] <= int(tempo)]
 
     flows['count'] = 1
     flows = flows[['i','j', 'origin_x', 'origin_y','dest_x','dest_y', 'count']].groupby(['i','j', 'origin_x', 'origin_y','dest_x','dest_y']).sum().sort_values(by=['count']).reset_index()

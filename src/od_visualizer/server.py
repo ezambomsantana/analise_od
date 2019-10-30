@@ -85,7 +85,11 @@ class Zonas(Resource):
 
 class Fluxos(Resource):
     def get(self):
-        fluxos = bike_flows()
+        args = request.args
+        elevacao = args['elevacao']
+        distancia = args['distancia']
+        tempo = args['tempo']
+        fluxos = bike_flows(elevacao, distancia, tempo)
         return fluxos.to_json()      
 
 
