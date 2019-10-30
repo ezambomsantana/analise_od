@@ -1,17 +1,28 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, request
 from flask_restful import Resource, Api
+from flask import render_template
 import json
 from server_functions import bike_flows, load_districts, load_subway, load_data17, load_cptm, load_graph, load_curitiba, load_zonas, load_graph_zonas
 from sp_grid import create
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', 
+            static_folder='static')
 api = Api(app)
 
 metro = load_subway()
 
 cptm = load_cptm()
 
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
+@app.route("/bike")
+def bike():
+    return render_template("bike.html")
+  
 class Metro(Resource):
     def get(self):
         return metro.to_json()
