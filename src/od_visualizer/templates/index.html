@@ -344,6 +344,8 @@
 
   <script type="text/javascript">
 
+    var server = 'localhost:5002'
+
     var subway = false;
     var cptm = false;
     var distritos = false;
@@ -581,7 +583,7 @@
       var orde = document.getElementById('orde').value;
       var motivo = document.getElementById('motivo').value;
       distritos = true;
-      var url = 'http://localhost:5002/distritos?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
+      var url = 'http://' + server + '/distritos?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
           + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo;
       fetch(url, {
         method: 'get',
@@ -617,7 +619,7 @@
       var orde = document.getElementById('orde').value;
       var motivo = document.getElementById('motivo').value;
       zonas = true;
-      url = 'http://localhost:5002/zonas?vehicleType='+ elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
+      url = 'http://' + server + '/zonas?vehicleType='+ elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
           + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo;
       fetch(url, {
         method: 'get',
@@ -707,7 +709,7 @@
         return;
       }
       subway = true;
-      var url = 'http://localhost:5002/metro'
+      var url = 'http://' + server + '/metro'
       fetch(url, {
         method: 'get',
         headers: {
@@ -750,10 +752,10 @@
       graph = true;
       var url
       if (zonasParam) {
-        url = 'http://localhost:5002/grafo_zonas?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
+        url = 'http://' + server + '/grafo_zonas?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
           + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo
       } else {
-        url = 'http://localhost:5002/grafo?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
+        url = 'http://' + server + '/grafo?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
           + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo
       }
       fetch(url, {
@@ -788,7 +790,7 @@
         return;
       }
       cptm = true;
-      var url = 'http://localhost:5002/cptm'
+      var url = 'http://' + server + '/cptm'
       fetch(url, {
         method: 'get',
         headers: {
@@ -821,7 +823,7 @@
         return;
       }
       pontos = true;
-      var url = 'http://localhost:5002/pontos'
+      var url = 'http://' + server + '/pontos'
       fetch(url, {
         method: 'get',
         headers: {
@@ -877,7 +879,7 @@
         return;
       }
       curitiba = true;
-      var url = 'http://localhost:5002/curitiba'
+      var url = 'http://' + server + '/curitiba'
       fetch(url, {
         method: 'get',
         headers: {
