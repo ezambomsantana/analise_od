@@ -29,6 +29,9 @@ arq17 = "dados17_distance.csv"
 data17 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=",", low_memory=False) 
 data17 = data17.dropna(subset=['CO_O_X'])
 
+data17 = data17.drop(['ID_DOM', 'FE_DOM', 'VIA_BICI','TP_ESTBICI','F_FAM','FE_FAM','FAMILIA','NO_MORAF',
+                      'CONDMORA','QT_BANHO','QT_EMPRE','QT_AUTO','QT_MICRO','QT_LAVALOU','QT_GEL1'], axis=1)
+
 csv_file = folder_data + "regioes17.csv"
 mydict = []
 with open(csv_file, mode='r') as infile:
@@ -116,11 +119,7 @@ def load_cptm():
 
 
 def load_data17():
-    folder_data = "../../data/"
-    arq17 = "dados17.csv"
-
-    data17_2 = pd.read_csv(folder_data + arq17, dtype={'ZONA_O': str, 'ZONA_D': str}, header=0,delimiter=";", low_memory=False) 
-    data17_2 = data17_2.dropna(subset=['CO_O_X']).head(100)
+    data17_2 = data17.dropna(subset=['CO_O_X']).head(100)
     geos = []
     for index, row in data17_2.iterrows():
         lat = row['CO_O_X']
@@ -252,5 +251,3 @@ def bike_flows(elevacao, distancia, tempo, flow):
 
     grafo = gpd.GeoDataFrame(frame)
     return grafo
-
-bike_flows("0","0","0","5000")

@@ -12,8 +12,6 @@ metro = load_subway()
 
 cptm = load_cptm()
 
-data17 = load_data17()
-
 class Metro(Resource):
     def get(self):
         return metro.to_json()
@@ -37,6 +35,7 @@ class Distritos(Resource):
 
 class Pontos(Resource):
     def get(self):
+        data17 = load_data17()
         return data17['coords'].to_json()
 
 
