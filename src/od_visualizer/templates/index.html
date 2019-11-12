@@ -102,8 +102,8 @@
 
             <div class="form-group">
               <label for="exampleFormControlSelect2">Transporte:</label>
-              <input type="checkbox" value="metro" onclick="initiate_subway()">Metrô</input>
-              <input type="checkbox" value="metro" onclick="initiate_cptm()">CPTM</input>
+              <input type="checkbox" id="metro">Metrô</input>
+              <input type="checkbox" id="cptm">CPTM</input>
             </div>
             <!-- input type="checkbox" value="metro" onclick="initiate_pontos()">Pontos</input></br -->
 
@@ -188,12 +188,6 @@
 
           </div>
         </div>
-
-
-
-
-
-
 
 
 
@@ -368,6 +362,9 @@
       var layerDistritos = document.getElementById('layerDistritos').checked;
       var layerZonas = document.getElementById('layerZonas').checked;
 
+      var metro = document.getElementById('metro').checked;
+      var cptm = document.getElementById('cptm').checked;
+
       for(var key in layers) {
         var value = layers[key];
         layers[key] = null;
@@ -389,6 +386,14 @@
         initiate_zonas();
       }
 
+      if (metro) {
+        initiate_subway();
+      }
+
+      if (cptm) {
+        initiate_cptm();
+      }
+ 
       if (graphDistritos && graphZonas) {
         alert('Selecione apenas distritos ou zonas.');
         return;
