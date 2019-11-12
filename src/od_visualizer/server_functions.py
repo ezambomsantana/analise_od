@@ -54,6 +54,12 @@ data17['NUM_TRANS'] = data17[['MODO1', 'MODO2','MODO3','MODO4']].count(axis=1)
 
 data17 = calculate_weighted_mean(data17)
 
+def list_zonas():
+    return pd.Series(data17['ZONA_O'].unique()).to_json(orient='values')
+
+def list_distritos():
+    return pd.Series(data17['NOME_O'].unique()).to_json(orient='values')
+
 def load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
 
     data17_copy = data17
@@ -117,7 +123,6 @@ def load_cptm():
     cptm = cptm.to_crs({"init": "epsg:4326"})
     return cptm
 
-
 def load_data17():
     data17_2 = data17.dropna(subset=['CO_O_X']).head(100)
     geos = []
@@ -167,7 +172,6 @@ def load_curitiba():
     curitiba = gpd.GeoDataFrame.from_file("../../data/shapes/DIVISA_DE_REGIONAIS.shp", encoding='latin-1')
     curitiba.crs = {'init' :'epsg:22522'}
     curitiba = curitiba.to_crs({"init": "epsg:4326"})
-    print(curitiba)
     return curitiba
 
 def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):

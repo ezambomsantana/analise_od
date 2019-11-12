@@ -3,8 +3,9 @@ from flask import Flask, request
 from flask_restful import Resource, Api
 from flask import render_template
 import json
-from server_functions import bike_flows, load_districts, load_subway, load_data17, load_cptm, load_graph, load_curitiba, load_zonas, load_graph_zonas
+from server_functions import bike_flows, load_districts, load_subway, load_data17, load_cptm, load_graph, load_curitiba, load_zonas, load_graph_zonas, list_distritos, list_zonas
 from sp_grid import create
+import json
 
 app = Flask(__name__, static_url_path='', 
             static_folder='static')
@@ -102,11 +103,19 @@ class Fluxos(Resource):
         fluxos = bike_flows(elevacao, distancia, tempo, flow)
         return fluxos.to_json()      
 
-
-
 class Grids(Resource):
     def get(self):
         return create().geodataframe().to_json()      
+
+
+class ListZonas(Resource):
+    def get(self):
+        return list_zonas()
+
+
+class ListDistritos(Resource):
+    def get(self):
+        return list_distritos()
 
 api.add_resource(Metro, '/metro')
 api.add_resource(Distritos, '/distritos') 
@@ -118,6 +127,8 @@ api.add_resource(Curitiba, '/curitiba')
 api.add_resource(Zonas, '/zonas')
 api.add_resource(Fluxos, '/fluxos')
 api.add_resource(Grids, '/grids')
+api.add_resource(ListZonas, '/list_zonas')
+api.add_resource(ListDistritos, '/list_distritos')
 
 if __name__ == '__main__':
      app.run(port='5002')
