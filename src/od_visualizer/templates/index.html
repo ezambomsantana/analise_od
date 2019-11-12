@@ -80,22 +80,24 @@
 
           <div id='filters' style="float:left">
 
+            <button onclick="reload()">Recarregar</button>  
+
             <div class="form-group">
               <label for="exampleFormControlSelect2">Viagens:</label>
-              <input type="checkbox" value="metro" onclick="initiate_graph(true)">Zonas</input>
-              <input type="checkbox" value="metro" onclick="initiate_graph(false)">Distritos</input>
+              <input type="checkbox" id="graphZonas" value="graphZonas">Zonas</input>
+              <input type="checkbox" id="graphDistritos" value="graphDistritos">Distritos</input>
             </div>
             <!-- input type="checkbox" value="metro" onclick="initiate_curitiba()">Curitiba</input></br -->
 
             <div class="form-group">
               <label for="exampleFormControlSelect2">Áreas:</label>
-              <input type="checkbox" value="metro" onclick="initiate_zonas()">Zonas</input>
-              <input type="checkbox" value="metro" onclick="initiate_distritos()">Distritos</input>
+              <input type="checkbox" id="layerZonas">Zonas</input>
+              <input type="checkbox" id="layerDistritos">Distritos</input>
               </br>
-              Indicador: <input type="checkbox" value="metro" onclick="change_renda()">Renda</input>
-              &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_distancia()">Distância</input>
-              &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_tempo()">Tempo</input>
-              &nbsp;&nbsp;&nbsp;<input type="checkbox" value="metro" onclick="change_quantidade()">Viagens</input></br>
+              Indicador: <input type="checkbox" id="renda">Renda</input>
+              &nbsp;&nbsp;&nbsp;<input type="checkbox" id="distancia">Distância</input>
+              &nbsp;&nbsp;&nbsp;<input type="checkbox" id="tempo">Tempo</input>
+              &nbsp;&nbsp;&nbsp;<input type="checkbox" id="quantidade">Viagens</input></br>
             </div>
 
             <div class="form-group">
@@ -346,33 +348,49 @@
 
     var server = 'localhost:5002'
 
-    var subway = false;
-    var cptm = false;
-    var distritos = false;
-    var pontos = false;
-    var graph = false;
-    var curitiba = false;
-    var zonas = false;
-
-    var renda = false;
-    var distancia = false;
-    var tempo = false;
-    var quantidade = false;
-
-    var subwayLayer;
-    var distritosLayer;
-    var zonasLayer;
-    var pontosLayer;
-    var graphLayer;
-    var cptmLayer;
-    var curitibaLayer;
-    var zonasLayer;
-
+    var layers = {};
 
     var map = L.map('map').setView([-23.5, -46.5], 8);
     var metro_data;
     var pontos_data;
 
+    function reload() {
+      var graphDistritos = document.getElementById('graphDistritos').checked;
+      var graphZonas = document.getElementById('graphZonas').checked;
+
+      var layerDistritos = document.getElementById('layerDistritos').checked;
+      var layerZonas = document.getElementById('layerZonas').checked;
+
+      for(var key in layers) {
+        var value = layers[key];
+        layers[key] = null;
+        if (value != null) {
+          map.removeLayer(value);
+        }
+      }
+      
+      if (graphDistritos && graphZonas) {
+        alert('Selecione apenas distritos ou zonas.');
+        return;
+      }
+      if (graphDistritos) {
+        initiate_graph(false);
+      } 
+      if (graphZonas) {
+        initiate_graph(true)
+      }
+
+      if (layerDistritos && layerZonas) {
+        alert('Selecione apenas distritos ou zonas.');
+      }
+      if (layerDistritos) {
+        initiate_distritos();
+      } 
+      if (layerZonas) {
+        initiate_zonas();
+      }
+
+    }
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
       maxZoom: 18,
@@ -430,6 +448,11 @@
     }
 
     function style(feature) {
+
+      var renda = document.getElementById('renda').checked;
+      var distancia = document.getElementById('distancia').checked;
+      var tempo = document.getElementById('tempo').checked;
+      var quantidade = document.getElementById('quantidade').checked;
 
       if (!renda && !distancia && !tempo && !quantidade) {
         return {
@@ -569,12 +592,6 @@
     }
 
     function initiate_distritos() {
-      if (distritos) {
-        distritos = false;
-        map.removeLayer(distritosLayer);
-        return;
-      }
-
       var elements = Array.from(document.getElementById('vehicles').selectedOptions).map(v => v.value);
       var sexo = document.getElementById('sexo').value;
       var horarioInicio = document.getElementById('horarioInicio').value;
@@ -603,14 +620,7 @@
       });
     }
 
-
     function initiate_zonas() {
-      if (zonas) {
-        zonas = false;
-        map.removeLayer(zonasLayer);
-        return;
-      }
-
       var elements = Array.from(document.getElementById('vehicles').selectedOptions).map(v => v.value);
       var sexo = document.getElementById('sexo').value;
       var horarioInicio = document.getElementById('horarioInicio').value;
@@ -631,7 +641,10 @@
         response.json()
           .then(function (result) {
             statesData = JSON.parse(result)
-            show_zonas()
+            layers['zonasLayer']  = L.geoJson(statesData, {
+              style: style,
+              onEachFeature: onEachFeature
+            }).addTo(map);
             load_table()
           })
       }).catch(function (err) {
@@ -663,7 +676,7 @@
 
     function show_distritos() {
 
-      distritosLayer = L.geoJson(statesData, {
+      layers['distritosLayer'] = L.geoJson(statesData, {
         style: style,
         onEachFeature: onEachFeature
       }).addTo(map);
@@ -692,23 +705,7 @@
 
     };
 
-    function show_zonas() {
-
-      zonasLayer = L.geoJson(statesData, {
-        style: style,
-        onEachFeature: onEachFeature
-      }).addTo(map);
-
-    }
-
-
     function initiate_subway() {
-      if (subway) {
-        subway = false;
-        map.removeLayer(subwayLayer);
-        return;
-      }
-      subway = true;
       var url = 'http://' + server + '/metro'
       fetch(url, {
         method: 'get',
@@ -720,28 +717,16 @@
         response.json()
           .then(function (result) {
             metro_data = JSON.parse(result)
-            show_metro()
+            layers['subwayLayer'] = L.geoJson(metro_data, {
+              style: style_subway
+            }).addTo(map);
           })
       }).catch(function (err) {
         // Error
       });
     }
 
-    function show_metro() {
-      subwayLayer = L.geoJson(metro_data, {
-        style: style_subway
-      }).addTo(map);
-
-
-    };
-
     function initiate_graph(zonasParam) {
-      if (graph) {
-        graph = false;
-        map.removeLayer(graphLayer);
-        return;
-      }
-
       var elements = Array.from(document.getElementById('vehicles').selectedOptions).map(v => v.value);
       var sexo = document.getElementById('sexo').value;
       var horarioInicio = document.getElementById('horarioInicio').value;
@@ -749,13 +734,10 @@
       var origin = document.getElementById('origin').value;
       var orde = document.getElementById('orde').value;
       var motivo = document.getElementById('motivo').value;
-      graph = true;
-      var url
+      var url = 'http://' + server + '/grafo?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
+          + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo
       if (zonasParam) {
         url = 'http://' + server + '/grafo_zonas?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
-          + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo
-      } else {
-        url = 'http://' + server + '/grafo?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
           + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo
       }
       fetch(url, {
@@ -767,29 +749,18 @@
       }).then(function (response) {
         response.json()
           .then(function (result) {
-            graph_data = JSON.parse(result)
-            show_graph()
+            graph_data = JSON.parse(result)   
+            layers['graphLayer']  = L.geoJson(graph_data, {
+              style: style_graph,
+              onEachFeature: onEachFeature
+            }).addTo(map);
           })
       }).catch(function (err) {
         // Error
       });
     }
 
-    function show_graph() {
-      graphLayer = L.geoJson(graph_data, {
-        style: style_graph,
-        onEachFeature: onEachFeature
-      }).addTo(map);
-    };
-
-
     function initiate_cptm() {
-      if (cptm) {
-        cptm = false;
-        map.removeLayer(cptmLayer);
-        return;
-      }
-      cptm = true;
       var url = 'http://' + server + '/cptm'
       fetch(url, {
         method: 'get',
@@ -801,28 +772,16 @@
         response.json()
           .then(function (result) {
             cptm_data = JSON.parse(result)
-            show_cptm()
+            layers['cptmLayer'] = L.geoJson(cptm_data, {
+              style: style_cptm
+            }).addTo(map);
           })
       }).catch(function (err) {
         // Error
       });
     }
 
-    function show_cptm() {
-      cptmLayer = L.geoJson(cptm_data, {
-        style: style_cptm
-      }).addTo(map);
-
-
-    };
-
     function initiate_pontos() {
-      if (pontos) {
-        pontos = false;
-        map.removeLayer(pontosLayer);
-        return;
-      }
-      pontos = true;
       var url = 'http://' + server + '/pontos'
       fetch(url, {
         method: 'get',
@@ -834,51 +793,20 @@
         response.json()
           .then(function (result) {
             pontos_data = JSON.parse(result)
-            show_pontos()
+            var markerArray = [];
+            for (var i in pontos_data) {
+              position = pontos_data[i];
+              console.log(position)
+              markerArray.push(L.marker([position[1], position[0]]));
+            }
+            layers['pontosLayer']  = L.featureGroup(markerArray).addTo(map);
           })
       }).catch(function (err) {
         // Error
       });
     }
 
-    function show_pontos() {
-      var markerArray = [];
-      console.log(pontos_data)
-      for (var prop in pontos_data) {
-      }
-      for (var i in pontos_data) {
-        position = pontos_data[i];
-        console.log(position)
-        markerArray.push(L.marker([position[1], position[0]]));
-      }
-
-      pontosLayer = L.featureGroup(markerArray).addTo(map);
-    }
-
-    function change_renda() {
-      renda = !renda;
-    }
-
-    function change_distancia() {
-      distancia = !distancia;
-    }
-
-    function change_distancia() {
-      tempo = !tempo;
-    }
-
-    function change_quantidade() {
-      quantidade = !quantidade;
-    }
-
-
     function initiate_curitiba() {
-      if (curitiba) {
-        curitiba = false;
-        map.removeLayer(curitibaLayer);
-        return;
-      }
-      curitiba = true;
       var url = 'http://' + server + '/curitiba'
       fetch(url, {
         method: 'get',
@@ -890,20 +818,15 @@
         response.json()
           .then(function (result) {
             curitiba_data = JSON.parse(result)
-            show_curitiba()
+
+            layers['curitibaLayer']  = L.geoJson(curitiba_data, {
+              style: style
+            }).addTo(map);
           })
       }).catch(function (err) {
         // Error
       });
     }
-
-    function show_curitiba() {
-      curitibaLayer = L.geoJson(curitiba_data, {
-        style: style
-      }).addTo(map);
-
-
-    };
 
   </script>
 

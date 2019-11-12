@@ -18,7 +18,6 @@ cptm = load_cptm()
 def index():
     return render_template("index.html")
 
-
 @app.route("/bike")
 def bike():
     return render_template("bike.html")
