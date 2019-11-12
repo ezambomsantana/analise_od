@@ -253,12 +253,11 @@
         patterns: [
             {offset: '100%', repeat: 0, symbol: L.Symbol.arrowHead({pixelSize: 10, polygon: false, pathOptions: {stroke: true}})}
         ]
-    }).addTo(map);
+      }).addTo(map);
 
     };
 
-
-    function initiate_gridas() {
+    function initiate_grids() {
       curitiba = true;
       var url = 'http://' + server + '/grids'
       fetch(url, {
@@ -286,7 +285,7 @@
 
     };
     initiate_flows();
-    initiate_gridas();
+    initiate_grids();
 
   </script>
 
