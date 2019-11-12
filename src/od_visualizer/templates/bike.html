@@ -225,6 +225,7 @@
       }).then(function (response) {
         response.json()
           .then(function (result) {
+            console.log(result)
             fluxo_data = JSON.parse(result)
             console.log(fluxo_data)
             show_fluxos()

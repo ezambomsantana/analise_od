@@ -93,4 +93,4 @@ def create(n=40, west_offset=-.3, east_offset=.3, north_offset=.3, south_offset=
                      west_limit=SP_LON + west_offset,
                      east_limit=SP_LON + east_offset,
                      north_limit=SP_LAT + north_offset,
-                     south_limit=SP_LAT + south_offset)                     
+                     south_limit=SP_LAT + south_offset)

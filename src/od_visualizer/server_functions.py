@@ -6,6 +6,7 @@ import unidecode
 import math
 import utm
 from shapely.geometry import shape, LineString, Polygon
+from arrow import draw_arrow
 
 def calculate_weighted_mean(data):
     data['FE_VIA'] = data['FE_VIA'].apply(lambda x: 1 if math.isnan(x) else x)
@@ -245,7 +246,7 @@ def bike_flows(elevacao, distancia, tempo, flow):
     flows = flows[['i','j', 'origin_x', 'origin_y','dest_x','dest_y', 'FE_VIA']].groupby(['i','j', 'origin_x', 'origin_y','dest_x','dest_y']).sum().sort_values(by=['FE_VIA']).reset_index()
 
     for index, row in flows.iterrows():
-        line = LineString([(row['origin_x'],row['origin_y']), (row['dest_x'],row['dest_y'])])
+        line = draw_arrow(row['origin_x'],row['origin_y'], row['dest_x'],row['dest_y'])
         lines.append(line)
         viagens.append(row['FE_VIA'])
 
@@ -255,3 +256,5 @@ def bike_flows(elevacao, distancia, tempo, flow):
 
     grafo = gpd.GeoDataFrame(frame)
     return grafo
+
+bike_flows("0","0","0","0")
