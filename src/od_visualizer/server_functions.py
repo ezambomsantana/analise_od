@@ -61,7 +61,7 @@ def list_zonas():
 def list_distritos():
     return pd.Series(data17['NOME_O'].unique()).to_json(orient='values')
 
-def load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
+def load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo, front):
 
     data17_copy = data17
 
@@ -111,6 +111,9 @@ def load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motiv
     df['MEDIA_DIST'] = df['MP_DIST'] / df['FE_VIA']
     df = df.reset_index()
 
+    if not front:
+        return df
+
     dict_max = {}
     dict_max['max_tempo'] = df['MEDIA'].max()
     dict_max['max_renda'] = df['RENDA_FA'].max()
@@ -143,7 +146,7 @@ def load_data17():
     return data17_2
 
 def load_graph(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
-    df = load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo)
+    df = load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo, False)
     origin_distrito = df[df['NomeDistri'] == origin]
     lines = []
     viagens = []
@@ -156,10 +159,14 @@ def load_graph(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
             viagens.append(row['FE_VIA'])
     frame = pd.DataFrame(list(zip(lines, viagens)), columns =['geometry', 'FE_VIA'])
     grafo = gpd.GeoDataFrame(frame)
-    return grafo
+
+    dict_max = {}
+    dict_max['max_viagens'] = df['FE_VIA'].max()
+
+    return {'max' : dict_max, 'data' : grafo.to_json()}
 
 def load_graph_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
-    df = load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo)
+    df = load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo, False)
     origin_distrito = df[df['NomeZona'] == origin]
     lines = []
     viagens = []
@@ -172,7 +179,11 @@ def load_graph_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, mot
             viagens.append(row['FE_VIA'])
     frame = pd.DataFrame(list(zip(lines, viagens)), columns =['geometry', 'FE_VIA'])
     grafo = gpd.GeoDataFrame(frame)
-    return grafo
+    
+    dict_max = {}
+    dict_max['max_viagens'] = df['FE_VIA'].max()
+
+    return {'max' : dict_max, 'data' : grafo.to_json()}
 
 def load_curitiba():
     curitiba = gpd.GeoDataFrame.from_file("../../data/shapes/DIVISA_DE_REGIONAIS.shp", encoding='latin-1')
@@ -180,7 +191,7 @@ def load_curitiba():
     curitiba = curitiba.to_crs({"init": "epsg:4326"})
     return curitiba
 
-def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
+def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo, front):
 
     data17_copy = data17
 
@@ -229,9 +240,12 @@ def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
     df['MEDIA'] = df['MP'] / df['FE_VIA']
     df['MEDIA_DIST'] = df['MP_DIST'] / df['FE_VIA']
     df = df.reset_index()    
+
+    if not front:
+        return df
     
     dict_max = {}
-    
+
     dict_max['max_tempo'] = df['MEDIA'].max()
     dict_max['max_renda'] = df['RENDA_FA'].max()
     dict_max['max_distancia'] = df['MEDIA_DIST'].max()

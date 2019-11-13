@@ -739,11 +739,8 @@
       }).then(function (response) {
         response.json()
           .then(function (result) {
-            graph_data = JSON.parse(result)   
-           // layers['graphLayer']  = L.geoJson(graph_data, {
-           //   style: style_graph,
-           ///   onEachFeature: onEachFeature
-           // }).addTo(map);
+            graph_data = JSON.parse(result['data']) 
+            maxValues = result['max'];
 
             var lines = graph_data.features
             .filter(function(feature) { return feature.geometry.type == "LineString" })
@@ -752,7 +749,7 @@
                 var count = feature.properties.FE_VIA;
 
                 coordinates.forEach(function(coordinate) { coordinate.reverse(); })
-                return L.polyline(coordinates, {weight: count / 5000});
+                return L.polyline(coordinates, {weight: count * 5 / maxValues['max_viagens']});
             })
 
             lines.forEach(item => item.addTo(map));
