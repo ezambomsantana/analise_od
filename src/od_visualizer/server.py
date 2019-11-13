@@ -39,6 +39,8 @@ class Distritos(Resource):
         horarioInicio = args['horarioInicio']
         horarioFim = args['horarioFim']
         motivo = args['motivo']
+        # verificar origem
+
         mapa = load_districts(vehicle_type, sexo, horarioInicio, horarioFim, "0", 'NOME_O', motivo, True)
         return mapa
 
@@ -67,7 +69,6 @@ class Graph(Resource):
         horarioInicio = args['horarioInicio']
         horarioFim = args['horarioFim']
         origin = args['origin']
-        orde = args['orde']
         motivo = args['motivo']
         mapa = load_graph(vehicle_type, sexo, horarioInicio, horarioFim, origin, 'NOME_D', motivo)
         return mapa
