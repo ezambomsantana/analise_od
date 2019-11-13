@@ -69,7 +69,7 @@ class Graph(Resource):
         origin = args['origin']
         orde = args['orde']
         motivo = args['motivo']
-        mapa = load_graph(vehicle_type, sexo, horarioInicio, horarioFim, origin, orde, motivo, True)
+        mapa = load_graph(vehicle_type, sexo, horarioInicio, horarioFim, origin, 'NOME_D', motivo)
         return mapa
 
 class GraphZonas(Resource):

@@ -154,8 +154,9 @@ def load_graph(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
         if ~np.isnan(row['FE_VIA']):
             origin = origin_distrito['geometry'].iloc[0].centroid
             dest = row['geometry'].centroid
-            line = LineString([origin, dest])
-            lines.append(line)
+            if origin != dest:
+                line = LineString([origin, dest])
+                lines.append(line)
             viagens.append(row['FE_VIA'])
     frame = pd.DataFrame(list(zip(lines, viagens)), columns =['geometry', 'FE_VIA'])
     grafo = gpd.GeoDataFrame(frame)
@@ -174,8 +175,9 @@ def load_graph_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, mot
         if ~np.isnan(row['FE_VIA']):
             origin = origin_distrito['geometry'].iloc[0].centroid
             dest = row['geometry'].centroid
-            line = LineString([origin, dest])
-            lines.append(line)
+            if origin != dest:
+                line = LineString([origin, dest])
+                lines.append(line)
             viagens.append(row['FE_VIA'])
     frame = pd.DataFrame(list(zip(lines, viagens)), columns =['geometry', 'FE_VIA'])
     grafo = gpd.GeoDataFrame(frame)

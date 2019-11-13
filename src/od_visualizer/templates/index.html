@@ -166,7 +166,7 @@
             <div class="form-group">
               <label for="exampleFormControlSelect2">Horário Fim</label>
               <input class="form-control" type="text" value="0" id="horarioFim">
-            </div>      
+            </div>
             <div class="form-group">
               <label for="exampleFormControlSelect2">Zona</label>
               <select class="form-control" id="zonas_drop">
@@ -179,15 +179,6 @@
                   <option value="0">Todos</option>
               </select>
             </div>   
-            
-            <div class="form-group">
-              <label for="exampleFormControlSelect2">Destino ou Origem</label>
-              <select class="form-control" id="orde">
-                <option value="0" selected>Todos</option>
-                <option value="NOME_O" selected>01 - Origem</option>
-                <option value="NOME_D">02 - Destino</option>
-              </select>
-            </div> 
 
           </div>
         </div>
@@ -610,11 +601,10 @@
       var horarioInicio = document.getElementById('horarioInicio').value;
       var horarioFim = document.getElementById('horarioFim').value;
       var origin = document.getElementById('distritos_drop').value;
-      var orde = document.getElementById('orde').value;
       var motivo = document.getElementById('motivo').value;
       distritos = true;
       var url = 'http://' + server + '/distritos?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
-          + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo;
+          + '&origin=' + origin + '&motivo=' + motivo;
       fetch(url, {
         method: 'get',
         headers: {
@@ -644,11 +634,10 @@
       var horarioInicio = document.getElementById('horarioInicio').value;
       var horarioFim = document.getElementById('horarioFim').value;
       var origin = document.getElementById('zonas_drop').value;
-      var orde = document.getElementById('orde').value;
       var motivo = document.getElementById('motivo').value;
       zonas = true;
       url = 'http://' + server + '/zonas?vehicleType='+ elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
-          + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo;
+          + '&origin=' + origin + '&motivo=' + motivo;
       fetch(url, {
         method: 'get',
         headers: {
@@ -721,14 +710,13 @@
       var horarioInicio = document.getElementById('horarioInicio').value;
       var horarioFim = document.getElementById('horarioFim').value;
       var origin = document.getElementById('distritos_drop').value;
-      var orde = document.getElementById('orde').value;
       var motivo = document.getElementById('motivo').value;
       var url = 'http://' + server + '/grafo?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
-          + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo
+          + '&origin=' + origin + '&motivo=' + motivo
       if (zonasParam) {
         origin = document.getElementById('zonas_drop').value;
         url = 'http://' + server + '/grafo_zonas?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
-          + '&origin=' + origin  + '&orde=' + orde + '&motivo=' + motivo
+          + '&origin=' + origin + '&motivo=' + motivo
       }
       fetch(url, {
         method: 'get',
