@@ -51,7 +51,7 @@ class Zonas(Resource):
         horarioFim = args['horarioFim']
         motivo = args['motivo']
         mapa = load_zonas(vehicle_type, sexo, horarioInicio, horarioFim, "0", 'ZONA_O', motivo)
-        return mapa.to_json()
+        return mapa
 
 class Pontos(Resource):
     def get(self):
@@ -80,7 +80,6 @@ class GraphZonas(Resource):
         horarioInicio = args['horarioInicio']
         horarioFim = args['horarioFim']
         origin = args['origin']
-        orde = args['orde']
         motivo = args['motivo']
         mapa = load_graph_zonas(vehicle_type, sexo, horarioInicio, horarioFim, origin, 'ZONA_D', motivo)
         return mapa.to_json()

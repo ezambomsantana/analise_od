@@ -348,6 +348,7 @@
   <script type="text/javascript">
 
     var server = 'localhost:5002'
+    var maxValues;
 
     var layers = {};
 
@@ -493,15 +494,12 @@
     info.addTo(map);
 
     // get color depending on population density value
-    function getColor(d, mult) {
-      var value = 10000;
-      value = value * mult;
-
-      return d > value ? '#800026' :
-        d > value * 0.8 ? '#BD0026' :
-          d > value * 0.6 ? '#E31A1C' :
+    function getColor(d, value) {
+      return d > value * 0.85 ? '#800026' :
+        d > value * 0.7 ? '#BD0026' :
+          d > value * 0.55 ? '#E31A1C' :
             d > value * 0.4 ? '#FC4E2A' :
-              d > value * 0.2 ? '#FD8D3C' :
+              d > value * 0.25 ? '#FD8D3C' :
                 d > value * 0.1 ? '#FEB24C' :
                     '#FFEDA0';
     }
@@ -524,16 +522,16 @@
       var quantidade = document.getElementById('quantidade').checked;
 
       indicador = feature.properties.RENDA_FA;
-      mult = 1;
+      mult = maxValues['max_renda'];
       if (tempo) {
         indicador = feature.properties.MEDIA;
-        mult = 0.01;
+        mult = maxValues['max_tempo'];
       } else if (distancia) {
         indicador = feature.properties.MEDIA_DIST;
-        mult = 2;
+        mult = maxValues['max_distancia'];
       } else if (quantidade) {
-        indicador = feature.properties.FE_VIA
-        mult = 0.1
+        indicador = feature.properties.FE_VIA;
+        mult = maxValues['max_quantidade'];
       }
  
       if (!renda && !distancia && !tempo && !quantidade) {
@@ -626,9 +624,8 @@
       }).then(function (response) {
         response.json()
           .then(function (result) {
-            console.log(result)
-            console.log(result['data'])
             statesData = JSON.parse(result['data'])
+            maxValues = result['max'];
             layers['distritosLayer'] = L.geoJson(statesData, {
               style: style,
               onEachFeature: onEachFeature
@@ -661,7 +658,8 @@
       }).then(function (response) {
         response.json()
           .then(function (result) {
-            statesData = JSON.parse(result)
+            statesData = JSON.parse(result['data'])
+            maxValues = result['max'];
             layers['zonasLayer']  = L.geoJson(statesData, {
               style: style,
               onEachFeature: onEachFeature

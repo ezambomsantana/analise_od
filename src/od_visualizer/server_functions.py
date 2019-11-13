@@ -112,12 +112,10 @@ def load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motiv
     df = df.reset_index()
 
     dict_max = {}
-    print(dict_max)
     dict_max['max_tempo'] = df['MEDIA'].max()
     dict_max['max_renda'] = df['RENDA_FA'].max()
     dict_max['max_distancia'] = df['MEDIA_DIST'].max()
     dict_max['max_quantidade'] = df['FE_VIA'].max()
-    print(dict_max)
 
     return {'max' : dict_max, 'data' : df.to_json()}
 
@@ -230,8 +228,16 @@ def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
     df = zonas.set_index('NomeZona').join(data_mp).join(data_mp2).join(data_renda).join(data_trans).join(data_mp_dist)
     df['MEDIA'] = df['MP'] / df['FE_VIA']
     df['MEDIA_DIST'] = df['MP_DIST'] / df['FE_VIA']
-    df = df.reset_index()
-    return df
+    df = df.reset_index()    
+    
+    dict_max = {}
+    
+    dict_max['max_tempo'] = df['MEDIA'].max()
+    dict_max['max_renda'] = df['RENDA_FA'].max()
+    dict_max['max_distancia'] = df['MEDIA_DIST'].max()
+    dict_max['max_quantidade'] = df['FE_VIA'].max()
+
+    return {'max' : dict_max, 'data' : df.to_json()}
 
 def bike_flows(elevacao, distancia, tempo, flow):
     flows = pd.read_csv("../flows.csv", encoding='latin-1')
