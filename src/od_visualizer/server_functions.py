@@ -110,7 +110,16 @@ def load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motiv
     df['MEDIA'] = df['MP'] / df['FE_VIA']
     df['MEDIA_DIST'] = df['MP_DIST'] / df['FE_VIA']
     df = df.reset_index()
-    return df
+
+    dict_max = {}
+    print(dict_max)
+    dict_max['max_tempo'] = df['MEDIA'].max()
+    dict_max['max_renda'] = df['RENDA_FA'].max()
+    dict_max['max_distancia'] = df['MEDIA_DIST'].max()
+    dict_max['max_quantidade'] = df['FE_VIA'].max()
+    print(dict_max)
+
+    return {'max' : dict_max, 'data' : df.to_json()}
 
 def load_subway():
     metro = gpd.GeoDataFrame.from_file("../../data/shapes//SIRGAS_SHP_linhametro_line.shp", encoding='latin-1')
@@ -138,7 +147,6 @@ def load_data17():
 def load_graph(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
     df = load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo)
     origin_distrito = df[df['NomeDistri'] == origin]
-    print(df['FE_VIA'])
     lines = []
     viagens = []
     for index, row in df.iterrows():
@@ -155,7 +163,6 @@ def load_graph(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
 def load_graph_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
     df = load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo)
     origin_distrito = df[df['NomeZona'] == origin]
-    print(df['FE_VIA'])
     lines = []
     viagens = []
     for index, row in df.iterrows():
@@ -256,5 +263,3 @@ def bike_flows(elevacao, distancia, tempo, flow):
 
     grafo = gpd.GeoDataFrame(frame)
     return grafo
-
-bike_flows("0","0","0","0")

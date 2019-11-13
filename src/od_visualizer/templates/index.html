@@ -170,17 +170,20 @@
             <div class="form-group">
               <label for="exampleFormControlSelect2">Zona</label>
               <select class="form-control" id="zonas_drop">
+                  <option value="0">Todos</option>
               </select>
             </div>   
             <div class="form-group">
               <label for="exampleFormControlSelect2">Distrito</label>
               <select class="form-control" id="distritos_drop">
+                  <option value="0">Todos</option>
               </select>
             </div>   
             
             <div class="form-group">
               <label for="exampleFormControlSelect2">Destino ou Origem</label>
               <select class="form-control" id="orde">
+                <option value="0" selected>Todos</option>
                 <option value="NOME_O" selected>01 - Origem</option>
                 <option value="NOME_D">02 - Destino</option>
               </select>
@@ -328,9 +331,6 @@
     </div>
   </div>
 
-  <!-- Principal JavaScript do Bootstrap
-    ================================================== -->
-  <!-- Foi colocado no final para a página carregar mais rápido -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
@@ -352,8 +352,6 @@
     var layers = {};
 
     var map = L.map('map').setView([-23.5, -46.5], 8);
-    var metro_data;
-    var pontos_data;
 
     function reload() {
       var graphDistritos = document.getElementById('graphDistritos').checked;
@@ -494,16 +492,17 @@
 
     info.addTo(map);
 
-
     // get color depending on population density value
-    function getColor(d) {
-      return d > 10000 ? '#800026' :
-        d > 8000 ? '#BD0026' :
-          d > 6000 ? '#E31A1C' :
-            d > 4000 ? '#FC4E2A' :
-              d > 2000 ? '#FD8D3C' :
-                d > 20 ? '#FEB24C' :
-                  d > 10 ? '#FED976' :
+    function getColor(d, mult) {
+      var value = 10000;
+      value = value * mult;
+
+      return d > value ? '#800026' :
+        d > value * 0.8 ? '#BD0026' :
+          d > value * 0.6 ? '#E31A1C' :
+            d > value * 0.4 ? '#FC4E2A' :
+              d > value * 0.2 ? '#FD8D3C' :
+                d > value * 0.1 ? '#FEB24C' :
                     '#FFEDA0';
     }
 
@@ -519,12 +518,24 @@
     }
 
     function style(feature) {
-
       var renda = document.getElementById('renda').checked;
       var distancia = document.getElementById('distancia').checked;
       var tempo = document.getElementById('tempo').checked;
       var quantidade = document.getElementById('quantidade').checked;
 
+      indicador = feature.properties.RENDA_FA;
+      mult = 1;
+      if (tempo) {
+        indicador = feature.properties.MEDIA;
+        mult = 0.01;
+      } else if (distancia) {
+        indicador = feature.properties.MEDIA_DIST;
+        mult = 2;
+      } else if (quantidade) {
+        indicador = feature.properties.FE_VIA
+        mult = 0.1
+      }
+ 
       if (!renda && !distancia && !tempo && !quantidade) {
         return {
           weight: 2,
@@ -534,62 +545,16 @@
           fillOpacity: 0.5,
           fillColor: '#FED976'
         };
-      }
-
-      if (renda) {
+      } else {
         return {
           weight: 2,
           opacity: 1,
           color: 'black',
           dashArray: '3',
           fillOpacity: 0.5,
-          fillColor: getColor(feature.properties.RENDA_FA)
+          fillColor: getColor(indicador, mult)
         };
       }
-
-      if (tempo) {
-        return {
-          weight: 2,
-          opacity: 1,
-          color: 'black',
-          dashArray: '3',
-          fillOpacity: 0.5,
-          fillColor: getColor(feature.properties.MEDIA)
-        };
-      }
-
-      if (distancia) {
-        return {
-          weight: 2,
-          opacity: 1,
-          color: 'black',
-          dashArray: '3',
-          fillOpacity: 0.5,
-          fillColor: getColor(feature.properties.MEDIA_DIST)
-        };
-      }
-
-      if (quantidade) {
-        return {
-          weight: 2,
-          opacity: 1,
-          color: 'black',
-          dashArray: '3',
-          fillOpacity: 0.5,
-          fillColor: getColor(feature.properties.FE_VIA)
-        };
-      }
-
-    }
-
-    function styleGrid(feature) {
-
-        return {
-          weight: 2,
-          opacity: 1,
-          color: 'black',
-          dashArray: '3',
-        };
     }
 
     function style_subway(feature) {
@@ -610,26 +575,6 @@
       };
     }
 
-    function style_flows(feature) {
-      return {
-        opacity: 1,
-        color: 'red',
-        fillOpacity: 1,
-        weight: getWidthFlow(feature.properties.count)
-      };
-    }
-
-    function getWidthFlow(d) {
-      return d > 40 ? 50 :
-        d > 30 ? 6 :
-          d > 20 ? 4 :
-            d > 10 ? 2 :
-              d > 5 ? 1 :
-                d > 5 ? 1 :
-                  d > 2 ? 100 :
-                    1;
-    }
-
     function style_cptm(feature) {
       return {
         opacity: 1,
@@ -640,7 +585,6 @@
 
     function highlightFeature(e) {
       var layer = e.target;
-
       info.update(layer.feature.properties);
     }
 
@@ -682,8 +626,14 @@
       }).then(function (response) {
         response.json()
           .then(function (result) {
-            statesData = JSON.parse(result)
-            show_distritos()
+            console.log(result)
+            console.log(result['data'])
+            statesData = JSON.parse(result['data'])
+            layers['distritosLayer'] = L.geoJson(statesData, {
+              style: style,
+              onEachFeature: onEachFeature
+            }).addTo(map);
+            layers['distritosLayer'].bringToBack()
             //load_table()
           })
       }).catch(function (err) {
@@ -746,16 +696,6 @@
         
     }
 
-    function show_distritos() {
-
-      layers['distritosLayer'] = L.geoJson(statesData, {
-        style: style,
-        onEachFeature: onEachFeature
-      }).addTo(map);
-      layers['distritosLayer'].bringToBack()
-
-    };
-
     function initiate_subway() {
       var url = 'http://' + server + '/metro'
       fetch(url, {
@@ -812,8 +752,9 @@
             .map(function(feature) {
                 var coordinates = feature.geometry.coordinates;
                 var count = feature.properties.FE_VIA;
+
                 coordinates.forEach(function(coordinate) { coordinate.reverse(); })
-                return L.polyline(coordinates, {weight: count / 1000});
+                return L.polyline(coordinates, {weight: count / 5000});
             })
 
             lines.forEach(item => item.addTo(map));

@@ -38,10 +38,19 @@ class Distritos(Resource):
         sexo = args['sexo']
         horarioInicio = args['horarioInicio']
         horarioFim = args['horarioFim']
-        origin = args['origin']
-        orde = args['orde']
         motivo = args['motivo']
-        mapa = load_districts(vehicle_type, sexo, horarioInicio, horarioFim, origin, orde, motivo)
+        mapa = load_districts(vehicle_type, sexo, horarioInicio, horarioFim, "0", 'NOME_O', motivo)
+        return mapa
+
+class Zonas(Resource):
+    def get(self):
+        args = request.args
+        vehicle_type = args['vehicleType']
+        sexo = args['sexo']
+        horarioInicio = args['horarioInicio']
+        horarioFim = args['horarioFim']
+        motivo = args['motivo']
+        mapa = load_zonas(vehicle_type, sexo, horarioInicio, horarioFim, "0", 'ZONA_O', motivo)
         return mapa.to_json()
 
 class Pontos(Resource):
@@ -80,18 +89,7 @@ class Curitiba(Resource):
     def get(self):
         return load_curitiba().to_json()  
 
-class Zonas(Resource):
-    def get(self):
-        args = request.args
-        vehicle_type = args['vehicleType']
-        sexo = args['sexo']
-        horarioInicio = args['horarioInicio']
-        horarioFim = args['horarioFim']
-        origin = args['origin']
-        orde = args['orde']
-        motivo = args['motivo']
-        mapa = load_zonas(vehicle_type, sexo, horarioInicio, horarioFim, origin, 'ZONA_O', motivo)
-        return mapa.to_json()      
+
 
 class Fluxos(Resource):
     def get(self):
