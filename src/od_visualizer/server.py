@@ -39,9 +39,12 @@ class Distritos(Resource):
         horarioInicio = args['horarioInicio']
         horarioFim = args['horarioFim']
         motivo = args['motivo']
-        # verificar origem
+        origin = args['origin']
+        flow = "NOME_O"
+        if origin != "0":
+            flow = "NOME_D"
 
-        mapa = load_districts(vehicle_type, sexo, horarioInicio, horarioFim, "0", 'NOME_O', motivo, True)
+        mapa = load_districts(vehicle_type, sexo, horarioInicio, horarioFim, origin, flow, motivo, True)
         return mapa
 
 class Zonas(Resource):
@@ -52,7 +55,11 @@ class Zonas(Resource):
         horarioInicio = args['horarioInicio']
         horarioFim = args['horarioFim']
         motivo = args['motivo']
-        mapa = load_zonas(vehicle_type, sexo, horarioInicio, horarioFim, "0", 'ZONA_O', motivo, True)
+        origin = args['origin']
+        flow = "ZONA_O"
+        if origin != "0":
+            flow = "ZONA_D"
+        mapa = load_zonas(vehicle_type, sexo, horarioInicio, horarioFim, origin, flow, motivo, True)
         return mapa
 
 class Pontos(Resource):
