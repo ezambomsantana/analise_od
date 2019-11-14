@@ -84,20 +84,20 @@
 
             <div class="form-group">
               <label for="exampleFormControlSelect2">Viagens:</label>
-              <input type="checkbox" id="graphZonas" value="graphZonas">Zonas</input>
-              <input type="checkbox" id="graphDistritos" value="graphDistritos">Distritos</input>
+              <input type="radio" id="graphZonas" name="graphType" value="graphZonas" > Zonas
+              <input type="radio" id="graphDistritos" name="graphType" value="graphDistritos"> Distritos
             </div>
-            <!-- input type="checkbox" value="metro" onclick="initiate_curitiba()">Curitiba</input></br -->
 
             <div class="form-group">
               <label for="exampleFormControlSelect2">Áreas:</label>
-              <input type="checkbox" id="layerZonas">Zonas</input>
-              <input type="checkbox" id="layerDistritos">Distritos</input>
+
+              <input type="radio" id="layerZonas" name="areaType" value="layerZonas" > Zonas
+              <input type="radio" id="layerDistritos" name="areaType" value="layerDistritos"> Distritos
               </br>
-              Indicador: <input type="checkbox" id="renda">Renda</input>
-              &nbsp;&nbsp;&nbsp;<input type="checkbox" id="distancia">Distância</input>
-              &nbsp;&nbsp;&nbsp;<input type="checkbox" id="tempo">Tempo</input>
-              &nbsp;&nbsp;&nbsp;<input type="checkbox" id="quantidade">Viagens</input></br>
+              Indicador: <input type="radio" name="indicador" id="renda">Renda</input>
+              &nbsp;&nbsp;&nbsp;<input type="radio" name="indicador" id="distancia">Distância</input>
+              &nbsp;&nbsp;&nbsp;<input type="radio" name="indicador" id="tempo">Tempo</input>
+              &nbsp;&nbsp;&nbsp;<input type="radio" name="indicador" id="quantidade">Viagens</input></br>
             </div>
 
             <div class="form-group">
@@ -366,9 +366,6 @@
         }
       }
 
-      if (layerDistritos && layerZonas) {
-        alert('Selecione apenas distritos ou zonas.');
-      }
       if (layerDistritos) {
         initiate_distritos();
       } 
@@ -384,10 +381,6 @@
         initiate_cptm();
       }
  
-      if (graphDistritos && graphZonas) {
-        alert('Selecione apenas distritos ou zonas.');
-        return;
-      }
       if (graphDistritos) {
         initiate_graph(false);
       } 
@@ -597,11 +590,11 @@
 
     function initiate_distritos() {
       var elements = Array.from(document.getElementById('vehicles').selectedOptions).map(v => v.value);
+      var motivo = Array.from(document.getElementById('motivo').selectedOptions).map(v => v.value);
       var sexo = document.getElementById('sexo').value;
       var horarioInicio = document.getElementById('horarioInicio').value;
       var horarioFim = document.getElementById('horarioFim').value;
       var origin = document.getElementById('distritos_drop').value;
-      var motivo = document.getElementById('motivo').value;
       distritos = true;
       var url = 'http://' + server + '/distritos?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
           + '&origin=' + origin + '&motivo=' + motivo;
@@ -630,11 +623,11 @@
 
     function initiate_zonas() {
       var elements = Array.from(document.getElementById('vehicles').selectedOptions).map(v => v.value);
+      var motivo = Array.from(document.getElementById('motivo').selectedOptions).map(v => v.value);
       var sexo = document.getElementById('sexo').value;
       var horarioInicio = document.getElementById('horarioInicio').value;
       var horarioFim = document.getElementById('horarioFim').value;
       var origin = document.getElementById('zonas_drop').value;
-      var motivo = document.getElementById('motivo').value;
       zonas = true;
       url = 'http://' + server + '/zonas?vehicleType='+ elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
           + '&origin=' + origin + '&motivo=' + motivo;
@@ -706,11 +699,11 @@
 
     function initiate_graph(zonasParam) {
       var elements = Array.from(document.getElementById('vehicles').selectedOptions).map(v => v.value);
+      var motivo = Array.from(document.getElementById('motivo').selectedOptions).map(v => v.value);
       var sexo = document.getElementById('sexo').value;
       var horarioInicio = document.getElementById('horarioInicio').value;
       var horarioFim = document.getElementById('horarioFim').value;
       var origin = document.getElementById('distritos_drop').value;
-      var motivo = document.getElementById('motivo').value;
       var url = 'http://' + server + '/grafo?vehicleType=' + elements + '&sexo=' + sexo + '&horarioInicio=' + horarioInicio + '&horarioFim=' + horarioFim
           + '&origin=' + origin + '&motivo=' + motivo
       if (zonasParam) {
