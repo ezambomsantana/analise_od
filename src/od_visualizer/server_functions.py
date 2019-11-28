@@ -111,6 +111,8 @@ def load_districts(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motiv
     df['MEDIA_DIST'] = df['MP_DIST'] / df['FE_VIA']
     df = df.reset_index()
 
+    df = df.drop(['NumeroDist', 'Area_ha'], axis=1)
+
     if not front:
         return df
 

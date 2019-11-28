@@ -187,6 +187,7 @@
       if (linesMap != null) {
         linesMap.forEach(item => map.removeLayer(item));
         map.removeLayer(arrowHead);  
+        linesMap = null;
       }
 
       elevacao = document.getElementById('elevacao').value;
@@ -204,8 +205,8 @@
       }).then(function (response) {
         response.json()
           .then(function (result) {
-            console.log(result.data)
-            fluxo_data = JSON.parse(result.data)
+            console.log(result)
+            fluxo_data = JSON.parse(result)
             console.log(fluxo_data)
             show_fluxos()
           })
