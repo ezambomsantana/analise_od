@@ -154,8 +154,9 @@
     function initiate_flows() {
       if (linesMap != null) {
         linesMap.forEach(item => map.removeLayer(item));
-        map.removeLayer(arrowHead);  
+        arrowHead.forEach(item => map.removeLayer(item));
         linesMap = null;
+        arrowHead = null;
       }
 
       elevacao = document.getElementById('elevacao').value;
