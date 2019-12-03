@@ -36,43 +36,13 @@
 
   <div class="container-fluid">
     <div class="row">
-      <nav class="col-md-2 d-none d-md-block bg-light sidebar">
-        <div class="sidebar-sticky">
-          <ul class="nav flex-column">
-            <li class="nav-item">
-              <a class="nav-link active" href="#">
-                <span data-feather="home"></span>
-                OD 2017 <span class="sr-only">(atual)</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span ></span>
-                OD 2007
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span ></span>
-                OD 1997
-              </a>
-            </li>
-          </ul>
-      </nav>
 
-      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
-        <div
-          class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <main role="main" class="col-md-12 col-lg-12">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h1 class="h2">Dashboard</h1>
           <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group mr-2">
-              <button class="btn btn-sm btn-outline-secondary">Compartilhar</button>
-              <button class="btn btn-sm btn-outline-secondary">Exportar</button>
             </div>
-            <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
-              <span data-feather="calendar"></span>
-              Esta semana
-            </button>
           </div>
         </div>
 
@@ -89,11 +59,15 @@
               </select>
             </div>
             <div class="form-group">
-              <label for="exampleFormControlSelect2">Distância</label>
+              <label for="exampleFormControlSelect2">Distância > (metros) </label>
               <input class="form-control" type="text" value="0" id="distancia">
             </div>      
             <div class="form-group">
-              <label for="exampleFormControlSelect2">Tempo</label>
+              <label for="exampleFormControlSelect2">Distância < (metros) </label>
+              <input class="form-control" type="text" value="0" id="distancia">
+            </div>      
+            <div class="form-group">
+              <label for="exampleFormControlSelect2">Tempo (minutos)</label>
               <input class="form-control" type="text" value="0" id="tempo">
             </div>   
             <div class="form-group">
@@ -138,7 +112,7 @@
     var ate4 = false; 
     var linesMap = null;
     var arrowHead = null;
-    var map = L.map('map').setView([-23.5, -46.5], 8);
+    var map = L.map('map').setView([-23.5489, -46.6388], 11);
 
     L.control.scale().addTo(map);
 
