@@ -137,4 +137,4 @@ api.add_resource(ListZonas, '/list_zonas')
 api.add_resource(ListDistritos, '/list_distritos')
 
 if __name__ == '__main__':
-     app.run(port='5002')
+     app.run(host='0.0.0.0', port='30116')
