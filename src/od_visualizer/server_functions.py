@@ -257,7 +257,7 @@ def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo, f
 
     return {'max' : dict_max, 'data' : df.to_json()}
 
-def bike_flows(elevacao, distancia, tempo, flow):
+def bike_flows(elevacao, distanciaMenor, distanciaMaior, tempo, flow):
     flows = pd.read_csv("../flows.csv", encoding='latin-1')
     lines = []
     viagens = []
@@ -268,8 +268,11 @@ def bike_flows(elevacao, distancia, tempo, flow):
     if elevacao != "0":
         flows = flows[flows['elevation'] == int(elevacao)]
 
-    if distancia != "0":
-        flows = flows[flows['distance'] <= int(distancia)]
+    if distanciaMenor != "0":
+        flows = flows[flows['distance'] <= int(distanciaMenor)]
+    
+    if distanciaMaior != "0":
+        flows = flows[flows['distance'] >= int(distanciaMaior)]
 
     if tempo != "0":
         flows = flows[flows['time'] <= int(tempo)]

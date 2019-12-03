@@ -102,10 +102,11 @@ class Fluxos(Resource):
     def get(self):
         args = request.args
         elevacao = args['elevacao']
-        distancia = args['distancia']
+        distanciaMenor = args['distanciaMenor']
+        distanciaMaior = args['distanciaMaior']
         tempo = args['tempo']
         flow = args['flow']
-        fluxos = bike_flows(elevacao, distancia, tempo, flow)
+        fluxos = bike_flows(elevacao, distanciaMenor, distanciaMaior, tempo, flow)
         return fluxos.to_json()      
 
 class Grids(Resource):

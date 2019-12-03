@@ -25,13 +25,7 @@
 
 <body>
   <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Nome da companhia</a>
-    <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
-    <ul class="navbar-nav px-3">
-      <li class="nav-item text-nowrap">
-        <a class="nav-link" href="#">Sair</a>
-      </li>
-    </ul>
+    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">BikeScience</a>
   </nav>
 
   <div class="container-fluid">
@@ -60,11 +54,11 @@
             </div>
             <div class="form-group">
               <label for="exampleFormControlSelect2">Distância > (metros) </label>
-              <input class="form-control" type="text" value="0" id="distancia">
+              <input class="form-control" type="text" value="0" id="distanciaMaior">
             </div>      
             <div class="form-group">
               <label for="exampleFormControlSelect2">Distância < (metros) </label>
-              <input class="form-control" type="text" value="0" id="distancia">
+              <input class="form-control" type="text" value="0" id="distanciaMenor">
             </div>      
             <div class="form-group">
               <label for="exampleFormControlSelect2">Tempo (minutos)</label>
@@ -165,11 +159,12 @@
       }
 
       elevacao = document.getElementById('elevacao').value;
-      distancia = document.getElementById('distancia').value;
+      distanciaMenor = document.getElementById('distanciaMenor').value;
+      distanciaMaior = document.getElementById('distanciaMaior').value;
       tempo = document.getElementById('tempo').value;
       flow = document.getElementById('flow').value;
 
-      var url = 'http://' + server + '/fluxos?elevacao=' + elevacao + '&distancia=' + distancia + '&tempo=' + tempo + '&flow=' + flow
+      var url = 'http://' + server + '/fluxos?elevacao=' + elevacao + '&distanciaMenor=' + distanciaMenor + '&distanciaMaior=' + distanciaMaior + '&tempo=' + tempo + '&flow=' + flow
       fetch(url, {
         method: 'get',
         headers: {
@@ -200,14 +195,28 @@
           return L.polyline(coordinates, {weight: count / 1000});
       })
 
+
       lines.forEach(item => item.addTo(map));
       linesMap = lines
+
+      var arrows = fluxo_data.features
+      .filter(function(feature) { return feature.geometry.type == "LineString" })
+      .map(function(feature) {
+          var coordinates = feature.geometry.coordinates;
+          var count = feature.properties.count;
+          arrow = L.polylineDecorator(coordinates, {
+            patterns: [
+                {offset: '100%', repeat: 0, symbol: L.Symbol.arrowHead({pixelSize: 10, polygon: false, pathOptions: {stroke: true, weight: count / 1000}})}
+            ]
+          })
+          return arrow;
+      })
+
+      alert('e nois')
       
-      arrowHead = L.polylineDecorator(lines, {
-        patterns: [
-            {offset: '100%', repeat: 0, symbol: L.Symbol.arrowHead({pixelSize: 10, polygon: false, pathOptions: {stroke: true}})}
-        ]
-      }).addTo(map);
+      arrows.forEach(item => item.addTo(map));
+      arrowHead = arrows
+
 
     };
 
