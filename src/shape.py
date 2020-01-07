@@ -10,6 +10,10 @@ import geopy.distance
 import utm
 from shapely.geometry import shape, LineString, Polygon
 
+
+mapa = gpd.GeoDataFrame.from_file("/home/eduardo/declividade/sirgas_declividade.shp", encoding='latin-1')
+print(mapa)
+
 def calculate_weighted_mean(data):
     data['FE_VIA'] = data['FE_VIA'].apply(lambda x: 1 if math.isnan(x) else x)
     data['FE_VIA'] = data['FE_VIA'].apply(lambda x: 1 if int(x) == 0 else x)
