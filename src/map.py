@@ -102,13 +102,16 @@ def load_districts(vehicle, orde):
 
 
 teste = load_districts("15", "NOME_D")
+teste2 = teste.to_crs({'init': 'epsg:3857'})
 
+teste2['area'] = teste2['geometry'].area / 10**6
+teste2['indice'] = teste['FE_VIA'] / teste2['area']
 
 cmap = mpl.cm.OrRd(np.linspace(0,1,20))
 cmap = mpl.colors.ListedColormap(cmap[10:,:-1])
 
 fig, ax = plt.subplots(1, 1)
-teste.plot(column='FE_VIA', ax=ax, legend=True, cmap=cmap)
+teste2.plot(column='indice', ax=ax, legend=True, cmap=cmap)
 
 plt.axis('off')
 plt.savefig(folder_images_maps + 'quantidade_bike.png', bbox_inches='tight', pad_inches=0.0)
@@ -136,7 +139,14 @@ distri.columns = ['Viagens']
 distri = mapa.set_index('NomeDistri').join(distri)
 fig, ax = plt.subplots(1, 1)
 
-distri.plot(column='Viagens', ax=ax, legend=True, cmap=cmap)
+distri2 = distri.to_crs({'init': 'epsg:3857'})
+
+distri2['area'] = distri2['geometry'].area / 10**6
+distri2['indice'] = distri2['Viagens'] / distri2['area']
+
+
+
+distri2.plot(column='indice', ax=ax, legend=True, cmap=cmap)
 
 plt.axis('off')
 plt.savefig(folder_images_maps + 'quantidade_bike_potencial.png', bbox_inches='tight', pad_inches=0.0)
@@ -144,13 +154,20 @@ plt.savefig(folder_images_maps + 'quantidade_bike_potencial.png', bbox_inches='t
 teste = teste.fillna(0)
 distri = distri.fillna(0)
 
-
 teste = teste.set_index('index').join(distri[['Viagens']], lsuffix='_left', rsuffix='_right')
 teste['JOIN'] = teste['Viagens'] - teste['FE_VIA']
-print(teste)
+
+print(teste['JOIN'])
+teste['JOIN'] = teste['JOIN'].clip(lower=0)
+print(teste['JOIN'])
+
+teste2 = teste.to_crs({'init': 'epsg:3857'})
+
+teste2['area'] = teste2['geometry'].area / 10**6
+teste2['indice'] = teste2['JOIN'] / teste2['area']
 
 fig, ax = plt.subplots(1, 1)
-teste.plot(column='JOIN', ax=ax, legend=True, cmap=cmap)
+teste2.plot(column='indice', ax=ax, legend=True, cmap=cmap)
 
 plt.axis('off')
 plt.savefig(folder_images_maps + 'quantidade_bike_join.png', bbox_inches='tight', pad_inches=0.0)
