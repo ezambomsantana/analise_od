@@ -85,6 +85,7 @@ class Graph(Resource):
         origin = args['origin']
         motivo = args['motivo']
         mapa = load_graph(vehicle_type, sexo, horarioInicio, horarioFim, origin, 'NOME_D', motivo)
+        print(mapa)
         return mapa
 
 class GraphZonas(Resource):
