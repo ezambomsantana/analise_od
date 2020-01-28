@@ -246,6 +246,38 @@
       }).addTo(map);
 
     };
+
+
+    function initiate_ciclovias() {
+      var url = 'http://' + server + '/ciclovias'
+      fetch(url, {
+        method: 'get',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then(function (response) {
+        response.json()
+          .then(function (result) {
+            cptm_data = JSON.parse(result)
+            ciclovias = L.geoJson(cptm_data, {
+              style: style_cptm
+            }).addTo(map);
+          })
+      }).catch(function (err) {
+        // Error
+      });
+    }
+
+    function style_cptm(feature) {
+      return {
+        opacity: 1,
+        color: 'red',
+        fillOpacity: 1
+      };
+    }
+
+    initiate_ciclovias();
     initiate_flows();
     initiate_grids();
 

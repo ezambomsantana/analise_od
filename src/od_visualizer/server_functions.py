@@ -130,6 +130,13 @@ def load_subway():
     metro = metro.to_crs({"init": "epsg:4326"})
     return metro
 
+
+def load_ciclovias():
+    metro = gpd.GeoDataFrame.from_file("../../data/shapes/SIRGAS_SHP_redecicloviaria.shp", encoding='latin-1')
+    metro.crs = {'init' :'epsg:22523'}
+    metro = metro.to_crs({"init": "epsg:4326"})
+    return metro
+
 def load_cptm():
     cptm = gpd.GeoDataFrame.from_file("../../data/shapes//SIRGAS_SHP_linhatrem_line.shp", encoding='latin-1')
     cptm.crs = {'init' :'epsg:22523'}
