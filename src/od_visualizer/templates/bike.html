@@ -151,7 +151,8 @@
         click: zoomToFeature
       });
     }
-    function initiate_flows() {
+
+    function initiate_flows_cars() {
       if (linesMap != null) {
         linesMap.forEach(item => map.removeLayer(item));
         arrowHead.forEach(item => map.removeLayer(item));
@@ -165,7 +166,7 @@
       tempo = document.getElementById('tempo').value;
       flow = document.getElementById('flow').value;
 
-      var url = 'http://' + server + '/fluxos?elevacao=' + elevacao + '&distanciaMenor=' + distanciaMenor + '&distanciaMaior=' + distanciaMaior + '&tempo=' + tempo + '&flow=' + flow
+      var url = 'http://' + server + '/fluxos_cars?elevacao=' + elevacao + '&distanciaMenor=' + distanciaMenor + '&distanciaMaior=' + distanciaMaior + '&tempo=' + tempo + '&flow=' + flow
       fetch(url, {
         method: 'get',
         headers: {
@@ -175,15 +176,53 @@
       }).then(function (response) {
         response.json()
           .then(function (result) {
+<<<<<<< HEAD
             fluxo_data = JSON.parse(result)
             show_fluxos()
+=======
+            fluxo_cars = JSON.parse(result)
+            show_fluxos_cars(fluxo_cars, 'blue')
+>>>>>>> 812446fc0adcde19d6613987053519593378c6e6
           })
       }).catch(function (err) {
         // Error
       });
     }
 
-    function show_fluxos() {
+
+    function initiate_flows_public() {
+      if (linesMap != null) {
+        linesMap.forEach(item => map.removeLayer(item));
+        arrowHead.forEach(item => map.removeLayer(item));
+        linesMap = null;
+        arrowHead = null;
+      }
+
+      elevacao = document.getElementById('elevacao').value;
+      distanciaMenor = document.getElementById('distanciaMenor').value;
+      distanciaMaior = document.getElementById('distanciaMaior').value;
+      tempo = document.getElementById('tempo').value;
+      flow = document.getElementById('flow').value;
+
+      var url = 'http://' + server + '/fluxos_public?elevacao=' + elevacao + '&distanciaMenor=' + distanciaMenor + '&distanciaMaior=' + distanciaMaior + '&tempo=' + tempo + '&flow=' + flow
+      fetch(url, {
+        method: 'get',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+      }).then(function (response) {
+        response.json()
+          .then(function (result) {
+            fluxo_public = JSON.parse(result)
+            show_fluxos_cars(fluxo_public, 'green')
+          })
+      }).catch(function (err) {
+        // Error
+      });
+    }
+
+    function show_fluxos_cars(fluxo_data, colorLine) {
 
       var lines = fluxo_data.features
       .filter(function(feature) { return feature.geometry.type == "LineString" })
@@ -191,7 +230,7 @@
           var coordinates = feature.geometry.coordinates;
           var count = feature.properties.count;
           coordinates.forEach(function(coordinate) { coordinate.reverse(); })
-          return L.polyline(coordinates, {weight: count / 1000});
+          return L.polyline(coordinates, {weight: count / 1000, color: colorLine});
       })
 
 
@@ -205,7 +244,7 @@
           var count = feature.properties.count;
           arrow = L.polylineDecorator(coordinates, {
             patterns: [
-                {offset: '100%', repeat: 0, symbol: L.Symbol.arrowHead({pixelSize: 10, polygon: false, pathOptions: {stroke: true, weight: count / 1000}})}
+                {offset: '100%', repeat: 0, symbol: L.Symbol.arrowHead({pixelSize: 10, polygon: false, pathOptions: {stroke: true, weight: count / 1000, color: colorLine}})}
             ]
           })
           return arrow;
@@ -238,11 +277,9 @@
     }
 
     function show_grids() {
-
       fluxoLayer = L.geoJson(fluxo_data, {
         style: styleGrid
       }).addTo(map);
-
     };
 
 
@@ -290,7 +327,8 @@
     }
 
     initiate_ciclovias();
-    initiate_flows();
+    initiate_flows_cars();
+    initiate_flows_public();
     initiate_grids();
 
   </script>

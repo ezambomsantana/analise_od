@@ -3,7 +3,7 @@ from flask import Flask, request
 from flask_restful import Resource, Api
 from flask import render_template
 import json
-from server_functions import load_ciclovias, bike_flows, load_districts, load_subway, load_data17, load_cptm, load_graph, load_curitiba, load_zonas, load_graph_zonas, list_distritos, list_zonas
+from server_functions import load_ciclovias, bike_flows_cars, bike_flows_public, load_districts, load_subway, load_data17, load_cptm, load_graph, load_curitiba, load_zonas, load_graph_zonas, list_distritos, list_zonas
 from sp_grid import create
 import json
 
@@ -106,7 +106,7 @@ class Curitiba(Resource):
 
 
 
-class Fluxos(Resource):
+class FluxosCars(Resource):
     def get(self):
         args = request.args
         elevacao = args['elevacao']
@@ -114,8 +114,19 @@ class Fluxos(Resource):
         distanciaMaior = args['distanciaMaior']
         tempo = args['tempo']
         flow = args['flow']
-        fluxos = bike_flows(elevacao, distanciaMenor, distanciaMaior, tempo, flow)
-        return fluxos.to_json()      
+        fluxos = bike_flows_cars(elevacao, distanciaMenor, distanciaMaior, tempo, flow)
+        return fluxos.to_json()     
+
+class FluxosPublic(Resource):
+    def get(self):
+        args = request.args
+        elevacao = args['elevacao']
+        distanciaMenor = args['distanciaMenor']
+        distanciaMaior = args['distanciaMaior']
+        tempo = args['tempo']
+        flow = args['flow']
+        fluxos = bike_flows_public(elevacao, distanciaMenor, distanciaMaior, tempo, flow)
+        return fluxos.to_json()       
 
 class Grids(Resource):
     def get(self):
@@ -139,7 +150,8 @@ api.add_resource(Graph, '/grafo')
 api.add_resource(GraphZonas, '/grafo_zonas')
 api.add_resource(Curitiba, '/curitiba')
 api.add_resource(Zonas, '/zonas')
-api.add_resource(Fluxos, '/fluxos')
+api.add_resource(FluxosCars, '/fluxos_cars')
+api.add_resource(FluxosPublic, '/fluxos_public')
 api.add_resource(Grids, '/grids')
 api.add_resource(ListZonas, '/list_zonas')
 api.add_resource(ListDistritos, '/list_distritos')
