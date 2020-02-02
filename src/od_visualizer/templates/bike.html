@@ -176,13 +176,8 @@
       }).then(function (response) {
         response.json()
           .then(function (result) {
-<<<<<<< HEAD
-            fluxo_data = JSON.parse(result)
-            show_fluxos()
-=======
             fluxo_cars = JSON.parse(result)
             show_fluxos_cars(fluxo_cars, 'blue')
->>>>>>> 812446fc0adcde19d6613987053519593378c6e6
           })
       }).catch(function (err) {
         // Error
