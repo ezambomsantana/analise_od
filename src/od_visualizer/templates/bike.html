@@ -68,7 +68,7 @@
               <label for="exampleFormControlSelect2">Fluxo Minímo</label>
               <input class="form-control" type="text" value="0" id="flow">
             </div> 
-            <button onclick="initiate_flows()">Recarregar</button>  
+            <button onclick="reload()">Recarregar</button>  
           </div>
         </div>
 
@@ -319,6 +319,11 @@
           fillOpacity: 1
         };        
       }
+    }
+
+    function reload() {
+      initiate_flows_cars();
+      initiate_flows_public();
     }
 
     initiate_ciclovias();
