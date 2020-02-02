@@ -166,7 +166,7 @@ def load_graph(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo):
             if origin != dest:
                 line = LineString([origin, dest])
                 lines.append(line)
-            viagens.append(row['FE_VIA'])
+                viagens.append(row['FE_VIA'])
     frame = pd.DataFrame(list(zip(lines, viagens)), columns =['geometry', 'FE_VIA'])
     grafo = gpd.GeoDataFrame(frame)
 
