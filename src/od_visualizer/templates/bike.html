@@ -175,9 +175,7 @@
       }).then(function (response) {
         response.json()
           .then(function (result) {
-            console.log(result)
             fluxo_data = JSON.parse(result)
-            console.log(fluxo_data)
             show_fluxos()
           })
       }).catch(function (err) {
@@ -273,19 +271,19 @@
       if (feature.properties.rc_tipo == 'ciclovia') {
         return {
           opacity: 1,
-          color: 'red',
+          color: '#1B5B24',
           fillOpacity: 1
         };
       } else if (feature.properties.rc_tipo == 'ciclofaixa') {
         return {
           opacity: 1,
-          color: 'blue',
+          color: '#662022',
           fillOpacity: 1
         };
       } else {
         return {
           opacity: 1,
-          color: 'yellow',
+          color: '#757320',
           fillOpacity: 1
         };        
       }
