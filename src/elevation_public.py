@@ -57,7 +57,7 @@ def calculate_distance_openservice(row):
 
             coords = ((origin[1],origin[0]), (dest[1], dest[0]))
             print(coords)
-            client = openrouteservice.Client(key='5b3ce3597851110001cf624887051db3a97b4cd28bfdb001dc78e025') # Specify your personal API key
+            client = openrouteservice.Client(key='5b3ce3597851110001cf6248396529ec9407473cb507315c7ab92eb7') # Specify your personal API key
             routes = client.directions(coords)
             geometry = routes['routes'][0]['geometry']
             elevs = client.elevation_line('encodedpolyline', geometry)

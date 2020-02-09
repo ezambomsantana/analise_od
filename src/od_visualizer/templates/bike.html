@@ -104,8 +104,10 @@
 
     var ate2 = false;
     var ate4 = false; 
-    var linesMap = null;
-    var arrowHead = null;
+
+    var layers = {};
+    var layersArrows = {};
+
     var map = L.map('map').setView([-23.5489, -46.6388], 11);
 
     L.control.scale().addTo(map);
@@ -153,12 +155,6 @@
     }
 
     function initiate_flows_cars() {
-      if (linesMap != null) {
-        linesMap.forEach(item => map.removeLayer(item));
-        arrowHead.forEach(item => map.removeLayer(item));
-        linesMap = null;
-        arrowHead = null;
-      }
 
       elevacao = document.getElementById('elevacao').value;
       distanciaMenor = document.getElementById('distanciaMenor').value;
@@ -177,7 +173,7 @@
         response.json()
           .then(function (result) {
             fluxo_cars = JSON.parse(result)
-            show_fluxos_cars(fluxo_cars, 'blue')
+            show_fluxos_cars(fluxo_cars, 'blue', 'car')
           })
       }).catch(function (err) {
         // Error
@@ -186,13 +182,6 @@
 
 
     function initiate_flows_public() {
-      if (linesMap != null) {
-        linesMap.forEach(item => map.removeLayer(item));
-        arrowHead.forEach(item => map.removeLayer(item));
-        linesMap = null;
-        arrowHead = null;
-      }
-
       elevacao = document.getElementById('elevacao').value;
       distanciaMenor = document.getElementById('distanciaMenor').value;
       distanciaMaior = document.getElementById('distanciaMaior').value;
@@ -210,14 +199,14 @@
         response.json()
           .then(function (result) {
             fluxo_public = JSON.parse(result)
-            show_fluxos_cars(fluxo_public, 'green')
+            show_fluxos_cars(fluxo_public, 'red', 'public')
           })
       }).catch(function (err) {
         // Error
       });
     }
 
-    function show_fluxos_cars(fluxo_data, colorLine) {
+    function show_fluxos_cars(fluxo_data, colorLine, type) {
 
       var lines = fluxo_data.features
       .filter(function(feature) { return feature.geometry.type == "LineString" })
@@ -230,7 +219,7 @@
 
 
       lines.forEach(item => item.addTo(map));
-      linesMap = lines
+      layers[type] = lines
 
       var arrows = fluxo_data.features
       .filter(function(feature) { return feature.geometry.type == "LineString" })
@@ -246,7 +235,7 @@
       })
       
       arrows.forEach(item => item.addTo(map));
-      arrowHead = arrows
+      layersArrows[type] = arrows
 
 
     };
@@ -322,6 +311,23 @@
     }
 
     function reload() {
+
+      for(var key in layers) {
+        var value = layers[key];
+        if (value != null) {
+          value.forEach(item => map.removeLayer(item));
+        }
+      }
+
+      for(var key in layersArrows) {
+        var value = layersArrows[key];
+        if (value != null) {
+          value.forEach(item => map.removeLayer(item));
+        }
+      }
+
+      
+
       initiate_flows_cars();
       initiate_flows_public();
     }
