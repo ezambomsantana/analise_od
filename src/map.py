@@ -23,8 +23,6 @@ mapa = gpd.GeoDataFrame.from_file("../data/shapes/Distritos_2017_region.shp", en
 mapa = mapa.to_crs({"init": "epsg:4326"})
 mapa['NomeDistri'] = mapa['NomeDistri'].apply(lambda x: unidecode.unidecode(x))
 
-mapa = mapa[mapa['NumeroDist'] <=96]
-
 zonas = gpd.GeoDataFrame.from_file("../data/shapes/Zonas_2017_region.shp", encoding='latin-1')
 zonas = zonas.to_crs({"init": "epsg:4326"}) 
 zonas['NomeDistri'] = zonas['NomeDistri'].apply(lambda x: unidecode.unidecode(x))
@@ -63,6 +61,11 @@ data17['ZONA_D'] = data17['ZONA_D'].apply(lambda x: '' if pd.isnull(x) else zona
 
 data17['NUM_TRANS'] = data17[['MODO1', 'MODO2','MODO3','MODO4']].count(axis=1)
 
+modos17 = {0:'Other',1:'Work',2:'Work',3:'Work',4:'School',5:'Shopping',6:'Health',7:'Entertainment', 8:'House',9:'Seek Employment', 10: 'Personal Issues', 11:'Food'}
+data17['MOTIVO_D'] = data17['MOTIVO_D'].replace(modos17)
+
+data17 = data17[data17['MOTIVO_D'] == 'Health']
+
 data17 = calculate_weighted_mean(data17)
 
 def load_districts(vehicle, orde):
@@ -91,7 +94,10 @@ def load_districts(vehicle, orde):
     data_trans = data17_copy[[orde, 'NUM_TRANS']].groupby([orde]).mean().sort_values(by=['NUM_TRANS']).reset_index()
     data_trans = data_trans.set_index(orde)
 
-    df = mapa.set_index('NomeDistri').join(data_mp).join(data_mp2).join(data_renda).join(data_trans).join(data_mp_dist)
+    data_dur = data17_copy[[orde, 'DURACAO']].groupby([orde]).mean().sort_values(by=['DURACAO']).reset_index()
+    data_dur = data_dur.set_index(orde)
+
+    df = mapa.set_index('NomeDistri').join(data_dur).join(data_mp).join(data_mp2).join(data_renda).join(data_trans).join(data_mp_dist)
     df['MEDIA'] = df['MP'] / df['FE_VIA']
     df['MEDIA_DIST'] = df['MP_DIST'] / df['FE_VIA']
     df = df.reset_index()
@@ -101,7 +107,7 @@ def load_districts(vehicle, orde):
     return df
 
 
-teste = load_districts("15", "NOME_D")
+teste = load_districts("0", "ZONA_O")
 teste2 = teste.to_crs({'init': 'epsg:3857'})
 
 teste2['area'] = teste2['geometry'].area / 10**6
@@ -120,9 +126,19 @@ plt.savefig(folder_images_maps + 'quantidade_bike.png', bbox_inches='tight', pad
 
 
 
+fig, ax = plt.subplots(1, 1)
+teste2.plot(column='DURACAO', ax=ax, legend=True, cmap=cmap)
+
+plt.axis('off')
+plt.savefig(folder_images_maps + 'duracao_viagem_saude.png', bbox_inches='tight', pad_inches=0.0)
 
 
-flows = pd.read_csv("flows.csv", encoding='latin-1')
+
+
+
+
+
+flows = pd.read_csv("../data/flows.csv", encoding='latin-1')
 lines = []
 viagens = []
 
