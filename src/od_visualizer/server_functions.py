@@ -265,7 +265,7 @@ def load_zonas(vehicle, sexo, horarioInicio, horarioFim, origin, orde, motivo, f
     return {'max' : dict_max, 'data' : df.to_json()}
 
 def bike_flows_cars(elevacao, distanciaMenor, distanciaMaior, tempo, flow):
-    flows = pd.read_csv("../flows.csv", encoding='latin-1')
+    flows = pd.read_csv("../../data/flows.csv", encoding='latin-1')
     lines = []
     viagens = []
 
@@ -300,7 +300,7 @@ def bike_flows_cars(elevacao, distanciaMenor, distanciaMaior, tempo, flow):
 
 
 def bike_flows_public(elevacao, distanciaMenor, distanciaMaior, tempo, flow):
-    flows = pd.read_csv("../flows_public.csv", encoding='latin-1')
+    flows = pd.read_csv("../../data/flows_public.csv", encoding='latin-1')
     lines = []
     viagens = []
 
