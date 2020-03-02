@@ -20,15 +20,12 @@ def calculate_weighted_mean(data):
     data['MP_DIST'] = data['FE_VIA'] * data['DISTANCE']
     return data
 
-zonas = gpd.GeoDataFrame.from_file("../data/shapes/Zonas_2017_region.shp", encoding='latin-1')
-zonas = zonas.to_crs({"init": "epsg:4326"}) 
+mapa = gpd.GeoDataFrame.from_file("../data/shapes/Distritos_2017_region.shp", encoding='latin-1')
+mapa = mapa.to_crs({"init": "epsg:4326"})
+mapa['NomeDistri'] = mapa['NomeDistri'].apply(lambda x: unidecode.unidecode(x))
 
-zonas['NomeDistri'] = zonas['NomeDistri'].apply(lambda x: unidecode.unidecode(x))
-zonas['NomeZona'] = zonas['NomeZona'].apply(lambda x: unidecode.unidecode(x))
 
-zonas = zonas[zonas['NumeroMuni'] == 36]
-
-print(zonas)
+mapa = mapa[mapa['NumeroDist'] <=96]
 
 teste = pd.read_csv('../data/alts.csv', index_col='id')
 print(teste)
@@ -46,6 +43,7 @@ with open('../data/labeled_network.xml') as fd:
     doc = xmltodict.parse(fd.read())
     
     for element in doc['network']['nodes']['node']:
+        print(element['@id'])
 
         if element['@id'] in mydict:
 
@@ -61,11 +59,11 @@ frame = pd.DataFrame(list(zip(xs, ys, zs)), columns =['x', 'y','z'])
 gdf = gpd.GeoDataFrame(
     frame, geometry=gpd.points_from_xy(frame.x, frame.y))
 print(gdf)
-sjoin = gpd.sjoin(zonas, gdf, op='contains')
+sjoin = gpd.sjoin(mapa, gdf, op='contains')
 
-conj17 = sjoin[['NomeZona', 'z']].groupby(['NomeZona']).std().sort_values(by=['z']).reset_index()
-conj17.columns = ['NomeZona', 'media']
-conj17 = conj17.set_index('NomeZona')
+conj17 = sjoin[['NomeDistri', 'z']].groupby(['NomeDistri']).std().sort_values(by=['z']).reset_index()
+conj17.columns = ['NomeDistri', 'media']
+conj17 = conj17.set_index('NomeDistri')
 print(conj17)
 
 conj17.to_csv('distrito_inclinacao.csv')
