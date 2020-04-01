@@ -63,6 +63,12 @@ data17['ZONA_D'] = data17['ZONA_D'].apply(lambda x: '' if pd.isnull(x) else zona
 
 data17['NUM_TRANS'] = data17[['MODO1', 'MODO2','MODO3','MODO4']].count(axis=1)
 
+data17 = data17[data17['IDADE'] >= 18]
+data17 = data17[data17['IDADE'] <= 55]
+
+data17 = data17[data17['MOTIVO_D'] != 5]
+data17 = data17[data17['MOTIVO_D'] != 6]
+
 modos17 = {0:'Other',1:'Work',2:'Work',3:'Work',4:'School',5:'Shopping',6:'Health',7:'Entertainment', 8:'House',9:'Seek Employment', 10: 'Personal Issues', 11:'Food'}
 data17['MOTIVO_D'] = data17['MOTIVO_D'].replace(modos17)
 
